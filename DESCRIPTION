@@ -1,0 +1,27 @@
+Package: tundra
+Title: Read, Colate, and Compile Asymmetric Data
+Version: 0.0.0.9000
+Authors@R: 
+    person("Ross",
+           "Campbell",
+           email = "thecampbells384@gmail.com",
+           role = c("aut", "cre"))
+Description: This package provides a suite of functions to aid
+	in the manipulation and curation of the often unconventional
+	datasets produced by the Tundra lab. The functions are designed
+	to accept asymmetric tabular data by default. Many functions
+	provide a mechanism for analysing columns to determine if their
+	contents pertain to specific data e.g. Year, Day, Snow_depth. These
+	functions are utilised to scan directories in search of specific
+	data sets. Other functions provide a basis for initial cleaning
+	and reporting of data in a standardised form.
+License: `use_mit_license()`, `use_gpl3_license()` or friends to
+    pick a license
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1.9001
+Imports: 
+    dplyr,
+    lubridate,
+    readr

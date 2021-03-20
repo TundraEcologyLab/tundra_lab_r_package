@@ -21,32 +21,25 @@ find_header <- function(file_path, sep){
   } else {
       search_limit <- number_of_rows
   }
-  # While no header has been found and 10 rows have not yet been checked, read the next
-  # row and check if it has non-numerical data in columns 2, 3, and 4.
-  while (length(skip) == 0 && row_number < search_limit){
-    # read next row of file, all data as characters
-    row <- dplyr::as_tibble(read.table(file = file_path,
-                                skip = row_number - 1,
-                                header = FALSE,
-                                colClasses = "character",
-                                sep = sep,
-                                strip.white = TRUE,
-                                row.names = NULL,
-                                nrows = 1))
-
-    # Only continue if there are at least 4 columns
-    if (length(row) > 3){
-      # If columns 2,3 and 4 contain data and not common meaningless header names
-      if (!is.na(row[2]) && !is.na(row[3]) && !is.na(row[4]) &&
-          !grepl("\\.\\.\\.[0-9]", row[2]) && !grepl("(^|,) *X[0-9] *(,|$)", row[2])){
-        # And if all that data is not numeric then set skip to one less row number
-        row <- as.numeric(row)
-        if (is.na(row[2]) && is.na(row[3]) && is.na(row[4])){skip <- row_number - 1}
-      }
-    }
-    row_number <- row_number + 1
-  }
-  # If no header line found set skip to "no header"
-  if (length(skip) == 0){skip = "no header"}
-  skip # Return number of rows to skip when loading file to make the first row the headers
+  # Load top of file to search for header line
+  # count.fields provides the number of columns per line. This is required to prevent R
+  # from truncating later columns that have additional columns. count.fields returns NA
+  # when a field contains a character string with carriage returns.
+  # The manual naming of columns to the length of the longest row ensures all data is loaded
+  number_of_cols <- max(
+      count.fields(file_path, sep = sep, quote = '""')[!is.na(count.fields(
+          file_path, sep = sep, quote = '""'))])
+  dataframe <- dplyr::as_tibble(read.table(file = file_path,
+                                           header = FALSE,
+                                           col.names = paste0("V", seq_len(number_of_cols)),
+                                           colClasses = "character",
+                                           sep = sep,
+                                           fill = TRUE,
+                                           strip.white = TRUE,
+                                           check.names = TRUE,
+                                           row.names = NULL,
+                                           nrows = search_limit
+  ))
+    # Determine number of rows to skip to laod file correctly with found header line
+    skips <- search_dataframe_for_header(dataframe, search_limit) - 1
 }

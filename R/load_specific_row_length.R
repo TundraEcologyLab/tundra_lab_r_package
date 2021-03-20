@@ -64,7 +64,8 @@ reheader_dataframe <- function(dataframe){
         new_dataframe <- dataframe[(header_row + 1):total_rows,]
         # Set header names of new dataframe to the names found in the detected header line
         header_names <- as.character(dataframe[header_row,])
-        names(new_dataframe) <- header_names
+        # Fix duplicate, missing, or invalid column names
+        names(new_dataframe) <- vctrs::vec_as_names(header_names, repair = "universal")
         dataframe <- new_dataframe
     }
     dataframe

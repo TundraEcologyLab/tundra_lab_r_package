@@ -106,7 +106,8 @@ load_file <- function(file_path, sep = NULL, split_file = FALSE){
 
 
   }
-
+  # fix duplicate, missing, or invalid column names
+  names(dataframe) <- vctrs::vec_as_names(names(dataframe), repair = "universal")
   dataframe
 }
 

@@ -4,7 +4,13 @@
 \alias{solar_identifier}
 \title{Identify which columns of a dataframe contain solar data}
 \usage{
-solar_identifier(dataframe, file_path, output_dir, W_or_KW = "KW")
+solar_identifier(
+  dataframe,
+  file_path,
+  output_dir,
+  W_or_KW = "KW",
+  hourly_data = FALSE
+)
 }
 \arguments{
 \item{dataframe}{A dataframe to be inspected for solar data. Must have a date column as its
@@ -19,17 +25,22 @@ solar data}
 
 \item{W_or_KW}{A character vector of either "W" or "KW" to permit the setting of the units
 expected. Defaults to KW/m2 if no value is given}
+
+\item{hourly_data}{TRUE, will search for data recorded hourly, FALSE will search for data recorded
+daily}
 }
 \description{
 A function which accepts a dataframe and returns a logical vector with a value for
 each of its columns determining if it contains solar data or not. The dataframe must
-have a date column named "date" as its last column. This can be added using the add_date
-function. The function can be instructed to look for data in W/m2 or KW/m2 through the
-W_or_KW parameter. Data is determined to be solar data if it passes 3 tests:
+have either a date column named "date" or a Day and Year column (and hour if performing hourly
+analysis). The function can be instructed to look for data in W/m2 or KW/m2 through the
+W_or_KW parameter. If hourly_data is set to FALSE then the function checks for daily data, else
+it checks for data recorded hourly. Data is determined to be solar data if it passes 3 tests:
 \enumerate{
 \item data is between 0 and 1 for KW/m2, 0 and 1000 for W/m2
 \item All winter data reads 0
-\item All summer data fits a sine curve with period of 1 year
+\item All summer data fits a sine curve with period of 1 year for daily data or a sine curve
+with a period of one day for hourly data
 Data just before or after winter is difficult to analyse. If more than 80\% of data is
 within this range, the file path is written to file in output_dir for manual inspection
 }

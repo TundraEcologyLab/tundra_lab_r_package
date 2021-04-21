@@ -86,7 +86,7 @@ load_file <- function(file_path, sep = NULL, split_file = FALSE){
     # containing all rows with the same number of columns
 
     # Determine length of every row in file
-    row_lengths <- count.fields(file_path, sep)
+    row_lengths <- count.fields(file_path, sep, '""')
     # Determine unique row lengths in file
     unique_row_lengths <- unique(sort(row_lengths))
 

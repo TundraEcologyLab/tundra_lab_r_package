@@ -10,10 +10,7 @@
 #' @param sep A character vector containing the character used to deliminate the file
 #' @export
 find_header <- function(file_path, sep){
-  # number of rows to skip when reading file so that the first row read is the header
-  skip <- vector("integer")
-  row_number <- 1  # The current row being read
-  # total number of rows in file
+
   number_of_rows <- length(count.fields(file_path, sep))
   # set number of rows to examine for a header to 10, unless there are less than 10 rows in file
   if (number_of_rows > 10){
@@ -41,5 +38,9 @@ find_header <- function(file_path, sep){
                                            nrows = search_limit
   ))
     # Determine number of rows to skip to laod file correctly with found header line
-    skips <- search_dataframe_for_header(dataframe, search_limit) - 1
+    skips <- search_dataframe_for_header(dataframe, search_limit)
+    if (skips != "no header"){
+        skips <- skips - 1
+    }
+    skips
 }

@@ -15,7 +15,7 @@
 #' the is_year function
 #' @export
 
-add_date <- function(dataframe, is_day = NULL, is_year = NULL){
+add_date <- function(dataframe, is_day = NULL, is_year = NULL, is_hour = NULL){
     # if not provided, produce a logical vector indicating which column contains day of year data
     if (is.null(is_day)){
         is_day <- day_identifier(dataframe)
@@ -24,11 +24,26 @@ add_date <- function(dataframe, is_day = NULL, is_year = NULL){
     if (is.null(is_year)){
         is_year <- year_identifier(dataframe)
     }
+    # if not provided, produce a logical vector indicating which column contains hour data
+    if (is.null(is_hour)){
+        is_hour <- hour_identifier(dataframe, return_fractional_day = FALSE)
+    }
+    # if hour data present create date in ymd_hm format, else ymd format
+    if (sum(is_hour) > 0){
+        dataframe[is_hour] <- as.character(dataframe[is_hour][[1]])
+        hour <- dataframe[is_hour][[1]]
+        dataframe[is_hour] <- ifelse(grepl("^...$", hour),
+                                     paste0("0", hour),
+                                     hour)
+        date <- lubridate::ymd_hm(paste0(dataframe[is_year][[1]], "0101", dataframe[is_hour][[1]]))
+    } else {
     # Create a vector of dates with the years identified in dataframe
     date <- lubridate::ymd(paste0(dataframe[is_year][[1]], "0101"))
-    # ammend date to accuratly reflect the day data contained in dataframe
+    }
+    # amend date to accurately reflect the day data contained in dataframe
     date <- lubridate::`yday<-`(date, as.numeric(dataframe[is_day][[1]]))
-    # Add date column at end of dataframe
+    # Add date column at end of dataframe, removing groups to make it possible
+    dataframe <- ungroup(dataframe)
     dataframe <- dataframe %>% dplyr::mutate(date = date)
     dataframe
 }

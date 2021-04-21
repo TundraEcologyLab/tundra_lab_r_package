@@ -1,4 +1,4 @@
-#' A function which takes a dataframe as input, and returns the row number where it 
+#' A function which takes a dataframe as input, and returns the row number where it
 #' has detected a posible header line. A line is considered to be a header if in rows
 #' 2,3, and 4 it contains non-numeric, non-blank data. If 2 potential header lines are
 #' found consecutively, the upper line is checked for known meaningless headers (V1-9, X1-9
@@ -10,7 +10,7 @@
 #' @param search_limit The number of rows from the top to check for a header. Defaults to
 #' 10. If the limit is set higher than the number of rows in dataframe then all rows are
 #' checked
-#' @export 
+#' @export
 search_dataframe_for_header <- function(dataframe, search_limit = 10){
   # return "no header" if dataframe has less than 4 columns. Such dataframes do not
   # have enough data to reliably determine headers
@@ -35,11 +35,11 @@ search_dataframe_for_header <- function(dataframe, search_limit = 10){
     header_row <- which(is_header, arr.ind = TRUE)
     return(header_row)
   } else if (sum(is_header) == 2){
-    # If 2 header lines are detected consecutively, check if the top header matches known
-    # meaningless headers. If so, return row number of lower header. Else, or if headers
-    # were not consecutive, return "no header"
+    # If 2 header lines are detected, check if the top header matches known
+    # meaningless headers. If so, return row number of lower header. Else,
+    # return "no header"
     header_rows <- which(is_header, arr.ind = TRUE)
-    if ((header_rows[2] - header_rows[1]) != 1){return("no header")}
+    #if ((header_rows[2] - header_rows[1]) != 1){return("no header")}
     nonesense_header <- grepl("\\.\\.\\.[0-9]", dataframe[[2]][header_rows[1]]) |
       grepl("^ *X[0-9] *$", dataframe[[2]][header_rows[1]]) |
       grepl("^ *V[0-9] *$", dataframe[[2]][header_rows[1]])

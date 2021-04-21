@@ -14,10 +14,10 @@
 file_type_identifier <- function(file_path){
     # Set spaces to a vector of integers counting the number of columns predicted
     # per line if the separator is a space
-    spaces <- count.fields(file_path)
+    spaces <- count.fields(file_path, quote = '""')
     # Set commas to a vector of integers counting the number of columns predicted
     # per line if the separator is a comma
-    commas <- count.fields(file_path, sep = ",")
+    commas <- count.fields(file_path, sep = ",", quote = '""')
 
     #remove NA values from both spaces and commas. NAs are generated if carriage returns
     # are encountered within a field

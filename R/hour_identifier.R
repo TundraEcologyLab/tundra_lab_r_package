@@ -19,7 +19,7 @@
 #' @export
 
 
-hour_identifier <- function(dataframe, is_day = NULL, is_year = NULL){
+hour_identifier <- function(dataframe, is_day = NULL, is_year = NULL, return_fractional_day = TRUE){
     # If no is_day data provided, generate using is_day function
     if (is.null(is_day)){
         is_day <- day_identifier(dataframe)
@@ -39,7 +39,7 @@ hour_identifier <- function(dataframe, is_day = NULL, is_year = NULL){
     i <- 1
     # While no time column has been identified and the search_range has not yet been
     # exceeded, continue to analyse columns
-    while((length(is_hour) == 0 | sum(is_hour) == 0) &  i < search_range){
+    while((length(is_hour) == 0 | sum(is_hour) == 0) &  i <= search_range){
         # Set col to next column in dataframe
         col <- dataframe[[i]]
         # Determine what percentage of data in col are in a time consistent format
@@ -60,10 +60,12 @@ hour_identifier <- function(dataframe, is_day = NULL, is_year = NULL){
             # FALSE to is_hour
             if (length(hour) > 23){
                 is_hour <- append(is_hour, TRUE)
+                if (return_fractional_day){
                 dataframe <- dplyr::mutate(dataframe, fractional_day = lubridate::yday(datetime) +
                                         (lubridate::hour(datetime) + lubridate::minute(datetime)/60)/24)
                 is_day <- append(is_day, FALSE)
                 is_year <- append(is_year, FALSE)
+                }
 
             } else {
                 is_hour <- append(is_hour, FALSE)
@@ -80,8 +82,15 @@ hour_identifier <- function(dataframe, is_day = NULL, is_year = NULL){
     if (length(dataframe) - length(is_hour) > 0){
     is_hour <- append(is_hour, rep(FALSE, length(dataframe) - length(is_hour)))
     }
+    # Amend is_hour depending on whether a dataframe containing the fractional_day column is
+    # to be returned
+    if (return_fractional_day == FALSE){
+        # If no fractional_day column is to be returned, remove it's entry from is_hour
+        is_hour <- is_hour[1:(length(is_hour) - 1)]
+    } else {
     # Return a list containing both the logical vector is_hour, and the dataframe updated
     # with a fractional day column
     is_hour <- list(is_hour, dataframe)
+    }
     is_hour
 }

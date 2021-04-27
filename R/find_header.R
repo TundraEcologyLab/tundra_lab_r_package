@@ -9,11 +9,12 @@
 #' @param file_path A path to the file that is to be checked for a header line
 #' @param sep A character vector containing the character used to deliminate the file
 #' @export
-find_header <- function(file_path, sep){
+find_header <- function(file_path, sep, multi_header = FALSE){
 
   number_of_rows <- length(count.fields(file_path, sep))
   # set number of rows to examine for a header to 10, unless there are less than 10 rows in file
-  if (number_of_rows > 10){
+  # or multi_header = TRUE
+  if (number_of_rows > 10 & !multi_header){
       search_limit <- 10
   } else {
       search_limit <- number_of_rows
@@ -38,7 +39,7 @@ find_header <- function(file_path, sep){
                                            nrows = search_limit
   ))
     # Determine number of rows to skip to laod file correctly with found header line
-    skips <- search_dataframe_for_header(dataframe, search_limit)
+    skips <- search_dataframe_for_header(dataframe, search_limit, multi_header)
     if (skips != "no header"){
         skips <- skips - 1
     }

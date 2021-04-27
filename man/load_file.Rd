@@ -4,7 +4,7 @@
 \alias{load_file}
 \title{Load CSV or Tab deliminated files despite asymmetry}
 \usage{
-load_file(file_path, sep = NULL, split_file = FALSE)
+load_file(file_path, sep = NULL, split_file = FALSE, multi_header = FALSE)
 }
 \arguments{
 \item{file_path}{A path to the file which is to be loaded}
@@ -13,6 +13,8 @@ load_file(file_path, sep = NULL, split_file = FALSE)
 
 \item{split_file}{If TRUE, a list of dataframes is returned, each dataframe consisting of all
 rows with the same number of columns}
+
+\item{multi_header}{Should multiple header lines be searched for within the file}
 }
 \description{
 A function to load the data from the file identified in file_path. If no separator is provided
@@ -23,4 +25,7 @@ header is ignored. load_file is configured to handle asymmetric files, and to st
 space from fields. All columns are read as characters to provide consistent data retrieval.
 If split_file TRUE, then a list of dataframes is returned, each dataframe consisting of all
 rows with the same number of columns
+If multi_header is TRUE, then the whole file is searched for possible header lines. If multiple
+headers are detected, the data between each header is loaded into seperate dataframes and a list
+of these dataframes is returned
 }

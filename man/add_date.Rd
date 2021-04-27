@@ -4,7 +4,7 @@
 \alias{add_date}
 \title{Add a date column to a dataframe containing Year and Day columns}
 \usage{
-add_date(dataframe, is_day = NULL, is_year = NULL)
+add_date(dataframe, is_day = NULL, is_year = NULL, is_hour = NULL)
 }
 \arguments{
 \item{is_day}{A logical vector with a value for every column in dataframe indicating if

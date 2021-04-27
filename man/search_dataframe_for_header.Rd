@@ -10,7 +10,7 @@ found consecutively, the upper line is checked for known meaningless headers (V1
 potential headers are detected or dataframe has less than 4 columns, then the character
 string "no header" is returned.}
 \usage{
-search_dataframe_for_header(dataframe, search_limit = 10)
+search_dataframe_for_header(dataframe, search_limit = 10, multi_header = FALSE)
 }
 \arguments{
 \item{dataframe}{The dataframe which is to be checked for the presence of a header line

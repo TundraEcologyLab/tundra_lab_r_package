@@ -4,7 +4,12 @@
 \alias{hour_identifier}
 \title{Identify which column of a dataframe contains time data}
 \usage{
-hour_identifier(dataframe, is_day = NULL, is_year = NULL)
+hour_identifier(
+  dataframe,
+  is_day = NULL,
+  is_year = NULL,
+  return_fractional_day = TRUE
+)
 }
 \arguments{
 \item{dataframe}{A dataframe to be checked for the presence of time data}

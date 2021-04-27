@@ -4,7 +4,7 @@
 \alias{find_header}
 \title{Locate header line within CSV or Tab deliminated file}
 \usage{
-find_header(file_path, sep)
+find_header(file_path, sep, multi_header = FALSE)
 }
 \arguments{
 \item{file_path}{A path to the file that is to be checked for a header line}

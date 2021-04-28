@@ -26,6 +26,6 @@ space from fields. All columns are read as characters to provide consistent data
 If split_file TRUE, then a list of dataframes is returned, each dataframe consisting of all
 rows with the same number of columns
 If multi_header is TRUE, then the whole file is searched for possible header lines. If multiple
-headers are detected, the data between each header is loaded into seperate dataframes and a list
+headers are detected, the data between each header is loaded into separate dataframes and a list
 of these dataframes is returned
 }

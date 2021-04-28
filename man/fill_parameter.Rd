@@ -10,7 +10,8 @@ fill_parameter(
   output_dir,
   file_path,
   col_name,
-  parameter_names = col_name
+  parameter_names = col_name,
+  ...
 )
 }
 \arguments{

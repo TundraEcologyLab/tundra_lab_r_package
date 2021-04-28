@@ -22,7 +22,7 @@ A function which accepts a character vector and returns all unique instances wit
 that match a year format. If no years are found then it returns NULL. Accepted formats include:
 4 digits not directly next to any other digits
 8 digits fitting year-month-day, day-month-year, or month-day-year formats.
-Certain dates will thow multiple years as they can be read in different formats, for example
+Certain dates will throw multiple years as they can be read in different formats, for example
 20062005 will return 2006 and 2005 because it fits both 20/jun/2005 and 20/may/2006. This can be
 prevented by selecting a date format, which ensures all dates are read in only one way. Regardless
 the date format, 4 digit years not directly touching other digits will always be returned. To further

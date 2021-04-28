@@ -9,7 +9,7 @@
 #' If split_file TRUE, then a list of dataframes is returned, each dataframe consisting of all
 #' rows with the same number of columns
 #' If multi_header is TRUE, then the whole file is searched for possible header lines. If multiple
-#' headers are detected, the data between each header is loaded into seperate dataframes and a list
+#' headers are detected, the data between each header is loaded into separate dataframes and a list
 #' of these dataframes is returned
 #' @param file_path A path to the file which is to be loaded
 #' @param sep A character vector of the separator used by the file to distinguish columns

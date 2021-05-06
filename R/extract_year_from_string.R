@@ -92,8 +92,8 @@ year_extractor <- function(string, date_format = "all", breaks = FALSE, unique =
         years <- unlist(years)
     }
     if (unique){
-    # Remove duplicated years
-    unique(years)
+        # Remove duplicated years
+        years <- unique(years)
     }
     years
 }
@@ -195,35 +195,35 @@ date_extractor <- function(string, date_format = "all", date_day_month = "date",
     # Finds 8 digits starting with a year 1980-2029 and followed by month and day,
     # not preceeded by a digit
     if (date_day_month == "date"){
-    if (date_format == "all" | date_format == "ymd"){
-        regex_list <- append(regex_list,
-                             year_month_day <- paste0(
-                                 "(?:(?=(?<date>[12][01289][0-9][0-9](?:0[1-9]|1[0-2])",
-                                 "(?:[0-2][0-9]|3[01])))(?![0-9]{9})(?<![0-9]))|",
-                                 "(?:(?=(?<dateS>[12][01289][0-9][0-9](?:\\W|_)(?:0[1-9]|1[0-2])",
-                                 "(?:\\W|_)(?:[0-2][0-9]|3[01])))(?![0-9]{11})(?<![0-9]))")
-        )
-    }
-    # as above but day-month-year format
-    if (date_format == "all" | date_format == "dmy"){
-        regex_list <- append(regex_list,
-                             day_month_year <- paste0(
-                                 "(?:(?=(?<date>(?:[0-2][0-9]|3[01])(?:0[1-9]|1[0-2])",
-                                 "[12][01289][0-9][0-9]))(?![0-9]{9})(?<![0-9]))|",
-                                 "(?:(?=(?<dateS>(?:[0-2][0-9]|3[01])(?:\\W|_)(?:0[1-9]|1[0-2])",
-                                 "(?:\\W|_)[12][01289][0-9][0-9]))(?![0-9]{11})(?<![0-9]))")
-        )
-    }
-    # And month-day-year format
-    if (date_format == "all" | date_format == "mdy"){
-        regex_list <- append(regex_list,
-                             month_day_year <- paste0(
-                                 "(?:(?=(?<date>(?:0[1-9]|1[0-2])(?:[0-2][0-9]|3[01])",
-                                 "[12][01289][0-9][0-9]))(?![0-9]{9})(?<![0-9]))|",
-                                 "(?:(?=(?<dateS>(?:0[1-9]|1[0-2])(?:\\W|_)(?:[0-2][0-9]|3[01])",
-                                 "(?:\\W|_)[12][01289][0-9][0-9]))(?![0-9]{11})(?<![0-9]))")
-        )
-    }
+        if (date_format == "all" | date_format == "ymd"){
+            regex_list <- append(regex_list,
+                                 year_month_day <- paste0(
+                                     "(?:(?=(?<date>[12][01289][0-9][0-9](?:0[1-9]|1[0-2])",
+                                     "(?:[0-2][0-9]|3[01])))(?![0-9]{9})(?<![0-9]))|",
+                                     "(?:(?=(?<dateS>[12][01289][0-9][0-9](?:\\W|_)(?:0[1-9]|1[0-2])",
+                                     "(?:\\W|_)(?:[0-2][0-9]|3[01])))(?![0-9]{11})(?<![0-9]))")
+            )
+        }
+        # as above but day-month-year format
+        if (date_format == "all" | date_format == "dmy"){
+            regex_list <- append(regex_list,
+                                 day_month_year <- paste0(
+                                     "(?:(?=(?<date>(?:[0-2][0-9]|3[01])(?:0[1-9]|1[0-2])",
+                                     "[12][01289][0-9][0-9]))(?![0-9]{9})(?<![0-9]))|",
+                                     "(?:(?=(?<dateS>(?:[0-2][0-9]|3[01])(?:\\W|_)(?:0[1-9]|1[0-2])",
+                                     "(?:\\W|_)[12][01289][0-9][0-9]))(?![0-9]{11})(?<![0-9]))")
+            )
+        }
+        # And month-day-year format
+        if (date_format == "all" | date_format == "mdy"){
+            regex_list <- append(regex_list,
+                                 month_day_year <- paste0(
+                                     "(?:(?=(?<date>(?:0[1-9]|1[0-2])(?:[0-2][0-9]|3[01])",
+                                     "[12][01289][0-9][0-9]))(?![0-9]{9})(?<![0-9]))|",
+                                     "(?:(?=(?<dateS>(?:0[1-9]|1[0-2])(?:\\W|_)(?:[0-2][0-9]|3[01])",
+                                     "(?:\\W|_)[12][01289][0-9][0-9]))(?![0-9]{11})(?<![0-9]))")
+            )
+        }
     } else if (date_day_month == "day"){
         if (date_format == "all" | date_format == "ymd"){
             regex_list <- append(regex_list,
@@ -315,15 +315,15 @@ date_extractor <- function(string, date_format = "all", date_day_month = "date",
         # Perform searches. Search_given_format appends the components it finds to the
         # components variable if one is provided
         component <- lapply(regex_list, search_given_format,
-                       string = string, target = component)
+                            string = string, target = component)
         component <- unlist(component)
     } else {
         # re-call this function for each string in string individually
         component <- lapply(string, date_extractor,
-                       date_format = date_format,
-                       date_day_month = date_day_month,
-                       breaks = breaks,
-                       unique -unique)
+                            date_format = date_format,
+                            date_day_month = date_day_month,
+                            breaks = breaks,
+                            unique -unique)
         component <- unlist(component)
     }
     # If no date format was provided and the day is asked for, only return days greater than 12
@@ -334,11 +334,12 @@ date_extractor <- function(string, date_format = "all", date_day_month = "date",
     }
     if (unique){
         # Remove duplicates
-        unique(component)
+        component <- unique(component)
     }
     component
 }
 search_given_format <- function(regex, string, target = NULL){
+    if (length(string) == 0){return()}
     if (is.na(string)){return()}
     # Perform grep search for given regex. Result is a list of attributes
     grep_result <- gregexpr(regex, string, perl = TRUE)

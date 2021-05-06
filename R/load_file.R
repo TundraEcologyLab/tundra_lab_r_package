@@ -34,7 +34,7 @@ load_file <- function(file_path, sep = NULL, split_file = FALSE, multi_header = 
                             skip = skip,
                             file_path = file_path,
                             sep = sep
-                            )
+        )
         # If only one dataframe then return as a dataframe rather than a list
         if (length(dataframe) == 1){
             dataframe <- as.data.frame(dataframe)
@@ -73,26 +73,33 @@ load_file <- function(file_path, sep = NULL, split_file = FALSE, multi_header = 
 }
 
 load <- function(skip, file_path, sep, skip_index){
+    # If skip index is for the last skip provided in skip (only a consideration when applying
+    # multi_header), then load to the end of the file, else load between the current skip index
+    # and skip_index + 1
     if (skip_index < length(skip)){
         n_rows <- skip[skip_index + 1] - skip[skip_index] - 1
     } else {
+        # negative n_rows are ignored, so the file will be loaded till the end
         n_rows <- -1
     }
     skip <- skip[skip_index]
     if (skip != "no header"){
         # If the header does not have a column name for every column with data then read.table will
-        # return an error. This will result in dataframe having a length of 0.
+        # return an error. This will result in dataframe having a length of 0. The quote is set to "\""
+        # to avoid apostorphes confusing the loading of file (the default for quote is both double and
+        # single quotes). If no quote is set then commas within cells will confuse loading
         dataframe <- data.frame()
         try(dataframe <- read.table(file = file_path,
-                                                     skip = skip,
-                                                     header = TRUE,
-                                                     colClasses = "character",
-                                                     sep = sep,
-                                                     fill = TRUE,
-                                                     strip.white = TRUE,
-                                                     check.names = FALSE,
-                                                     row.names = NULL,
-                                                     nrows = n_rows
+                                    skip = skip,
+                                    header = TRUE,
+                                    colClasses = "character",
+                                    sep = sep,
+                                    fill = TRUE,
+                                    strip.white = TRUE,
+                                    check.names = FALSE,
+                                    row.names = NULL,
+                                    nrows = n_rows,
+                                    quote = "\""
 
         ))
 
@@ -105,17 +112,19 @@ load <- function(skip, file_path, sep, skip_index){
             number_of_cols <- max(
                 count.fields(file_path, sep = sep, quote = '""')[!is.na(count.fields(
                     file_path, sep = sep, quote = '""'))])
-            dataframe <- dplyr::as_tibble(read.table(file = file_path,
-                                                     header = FALSE,
-                                                     col.names = paste0("V", seq_len(number_of_cols)),
-                                                     colClasses = "character",
-                                                     sep = sep,
-                                                     fill = TRUE,
-                                                     strip.white = TRUE,
-                                                     check.names = FALSE,
-                                                     row.names = NULL,
-                                                     nrows = n_rows
-            ))
+            dataframe <- read.table(file = file_path,
+                                    header = FALSE,
+                                    col.names = paste0("V", seq_len(number_of_cols)),
+                                    colClasses = "character",
+                                    sep = sep,
+                                    fill = TRUE,
+                                    strip.white = TRUE,
+                                    check.names = FALSE,
+                                    row.names = NULL,
+                                    nrows = n_rows,
+                                    quote = "\""
+
+            )
         }
     } else {
         # count.fields provides the number of columns per line. This is required to prevent R
@@ -126,17 +135,22 @@ load <- function(skip, file_path, sep, skip_index){
             count.fields(file_path, sep = sep, quote = '""')[!is.na(count.fields(
                 file_path, sep = sep, quote = '""'))])
         dataframe <- read.table(file = file_path,
-                                                 header = FALSE,
-                                                 col.names = paste0("V", seq_len(number_of_cols)),
-                                                 colClasses = "character",
-                                                 sep = sep,
-                                                 fill = TRUE,
-                                                 strip.white = TRUE,
-                                                 check.names = FALSE,
-                                                 row.names = NULL,
-                                                 nrows = n_rows
+                                header = FALSE,
+                                col.names = paste0("V", seq_len(number_of_cols)),
+                                colClasses = "character",
+                                sep = sep,
+                                fill = TRUE,
+                                strip.white = TRUE,
+                                check.names = FALSE,
+                                row.names = NULL,
+                                nrows = n_rows,
+                                quote = "\""
         )
     }
+    # Clean the column names of the loaded dataframe. If multiple columns exist with the same name
+    # iterate the duplicate names starting from one. Separate the name from the iterator by "_._"
+    # to ensure it is clear that the number is an automatically generated iterator and not original
+    # data
     dataframe <- janitor::clean_names(dataframe, unique_sep = "_._")
     dataframe <- dplyr::as_tibble(dataframe)
     list(dataframe)

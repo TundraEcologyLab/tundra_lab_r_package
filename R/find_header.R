@@ -36,7 +36,8 @@ find_header <- function(file_path, sep, multi_header = FALSE){
                                            strip.white = TRUE,
                                            check.names = TRUE,
                                            row.names = NULL,
-                                           nrows = search_limit
+                                           nrows = search_limit,
+                                           quote = "\""
   ))
     # Determine number of rows to skip to laod file correctly with found header line
     skips <- search_dataframe_for_header(dataframe, search_limit, multi_header)

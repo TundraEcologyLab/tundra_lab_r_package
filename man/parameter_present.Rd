@@ -4,7 +4,7 @@
 \alias{parameter_present}
 \title{Is parameter present?}
 \usage{
-parameter_present(dataframe, extractor_function, col_name)
+parameter_present(dataframe, extractor_function, col_name, ...)
 }
 \arguments{
 \item{dataframe}{A dataframe to be examined}

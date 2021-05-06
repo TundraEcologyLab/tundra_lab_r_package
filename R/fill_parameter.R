@@ -30,7 +30,7 @@ fill_parameter <- function(dataframe, extractor_function, output_dir, file_path,
     # If the column already exists, check that it contains the correct data. There are many examples
     # of year appearing as a column header when it was actually a single piece of unfortunately positioned
     # meta data
-    contains_parameter <- parameter_present(dataframe, extractor_function, col_name)
+    contains_parameter <- parameter_present(dataframe, extractor_function, col_name, ...)
     # Else, remove the erroneous column with name col_name
     if (!contains_parameter){
         dataframe <- select(dataframe, !dplyr::any_of(dplyr::matches(col_name)))
@@ -68,10 +68,10 @@ fill_parameter <- function(dataframe, extractor_function, output_dir, file_path,
 
         # Check that the dataframe now contains the parameter, if not, write the filepath to file for future
         # investigation
-        contains_parameter <- parameter_present(dataframe, extractor_function, col_name)
+        contains_parameter <- parameter_present(dataframe, extractor_function, col_name, ...)
 
         if (!contains_parameter){
-            write_lines(file_path, append = TRUE, file = paste0(output_dir, "/missing_", col_name," .txt"))
+            write_lines(file_path, append = TRUE, file = paste0(output_dir, "/missing_", col_name,".txt"))
 
         }
     }
@@ -91,7 +91,7 @@ fill_parameter <- function(dataframe, extractor_function, output_dir, file_path,
 #' @param col_name A character vector giving the name of the column to search for
 #' @export
 
-parameter_present <- function(dataframe, extractor_function, col_name){
+parameter_present <- function(dataframe, extractor_function, col_name, ...){
     contains_parameter <- FALSE
     if (col_name %in% names(dataframe)){
         # Find the index for the column containing col_name

@@ -31,11 +31,14 @@ standardise_treatment <- function(dataframe){
     OTC <- c("OTC", "T", "W", "W(CO2)", "CO2_T", "OTC (CO2)")
     cover <- c("cover", "Cover", "Cc")
     control <- c("control", "Pheno", "C", "Cp", "CO2_C", "Control", "Control (CO2)", "Control(CO2)")
-    addition <- c("addition", "snow addition", "A")
-    removal <- c("removal", "snow removal", "R")
+    addition <- c("addition", "snow addition", "A", "Add")
+    removal <- c("removal", "snow removal", "R", "Rem")
+    low <- c("low", "Low", "LOW")
+    high <- c("high", "High", "HIGH")
+    water <- c("water", "Water", "WATER")
 
     # Each of the treatment vectors are combined in one list so they can be iterated through later
-    treatment_list <- list(OTC, cover, control, addition, removal)
+    treatment_list <- list(OTC, cover, control, addition, removal, low, high, water)
 
 
     # If no CO2 column is present, create one called co2_plot. If one is present, ensure it is called
@@ -62,7 +65,7 @@ standardise_treatment <- function(dataframe){
             # Remove the BS plot data from the treatment column if present
             "{name}" := ifelse(
                 grepl("BS", .data[["site"]], ignore.case = TRUE) &
-                    grepl("[A-C]", .data[[name]], ignore.case = TRUE),
+                    grepl("^[A-C]$", .data[[name]], ignore.case = TRUE),
                 NA, .data[[name]]))
         # if CO2 is present in a treatment term ensure co2_plot indicates "Y"
         dataframe <- dplyr::mutate(dataframe,

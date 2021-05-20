@@ -27,3 +27,5 @@ Imports:
     readr,
     janitor,
     parallelDist
+Depends: 
+    R (>= 2.10)

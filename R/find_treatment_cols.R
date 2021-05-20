@@ -1,12 +1,12 @@
 #' Find Treatment Columns
-#' 
+#'
 #' A function which accepts a dataframe and returns it with any treatment columns identified as either
 #' otc_treatment or snow_treatment. If a column is present containing both snow and otc treatment
 #' then the data will be split into otc and snow treatment columns. If a mixed column is present as well
-#' as a dedicated snow or otc column this will cause the function to crash as it is not possible to 
-#' determine which data is to be kept. Any time a mixed otc/snow column is found a warning file is 
-#' produced in the output_dir containing the file_path of the original data. This is because it is 
-#' dificult to determine if "control" should belong to snow or otc.
+#' as a dedicated snow or otc column this will cause the function to crash as it is not possible to
+#' determine which data is to be kept. Any time a mixed otc/snow column is found a warning file is
+#' produced in the output_dir containing the file_path of the original data. This is because it is
+#' difficult to determine if "control" should belong to snow or otc.
 #' @param dataframe A dataframe containing columns with names matching regex "otc|treat" containing
 #' which are to be identified as either otc_treatment or snow_treatment
 #' @param file_path A file path for the original data. Used in the output of a warning message if
@@ -21,14 +21,15 @@ find_treatment_cols <- function(dataframe, output_dir, file_path){
   # Likewise, if a colunm contains none of the strings in snow_specific it is assumed not to
   # contain any snow treatment data.
   OTC_specific <- c("OTC", "Cover", "Pheno", "T", "Cc", "CO2_T", "W", "W(CO2)", "OTC (CO2")
-  snow_specific <- c("snow adition", "snow removal", "A", "R", "addition", "removal")
-  
-  
+  snow_specific <- c("snow adition", "snow removal", "A", "R", "addition", "removal", "Add", "Rem")
+  fert_specific <- c("Water", "water", "High", "high", "Low", "low")
+
+
   # The regex used to identify any treatment column. Any column not matching this will be ignored.
-  col_pattern <- "otc|treat"
+  col_pattern <- "otc|treat|fert"
   # A logical vector identifying which columns contain treatment data
   treatment_cols <- grepl(col_pattern, names(dataframe), ignore.case = TRUE)
-  
+
   # All treatment columns are renamed "treatment", and then make_clean_names is used to ensure that
   # if this produces duplicate column names that they are itterated with "_._" and then a counting
   # number.
@@ -41,10 +42,11 @@ find_treatment_cols <- function(dataframe, output_dir, file_path){
   for (name in names(dataframe)[treatment_cols]){
     # Determine the index of the treatment column
     name_index <- which(names(dataframe) == name, arr.ind = TRUE)
-    
+
     # Determine if treatment column contains any terms unique to either OTC or snow data
     OTC_present <- sum(OTC_specific %in% dataframe[[name_index]]) > 0
     snow_present <- sum(snow_specific %in% dataframe[[name_index]]) > 0
+    fert_present <- sum(fert_specific %in% dataframe[[name_index]]) > 0
     # If data from both otc and snow is present, create both an otc_treatment and snow_treatment column,
     # and attempt to separate the data between them. Also, create a warning file in output_dir
     if (OTC_present & snow_present){
@@ -78,6 +80,8 @@ find_treatment_cols <- function(dataframe, output_dir, file_path){
     } else if (snow_present){
       # Rename the treatment column that contains only snow data as snow_treatment
       dataframe <- dplyr::rename(dataframe, snow_treatment = .data[[name]])
+    } else if (fert_present){
+      dataframe <- dplyr::rename(dataframe, fert_treatment = .data[[name]])
     } else {
       # if no treatment data is found, and all data present is NA, remove the column from the
       # dataframe

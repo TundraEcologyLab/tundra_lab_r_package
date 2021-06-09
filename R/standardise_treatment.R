@@ -71,12 +71,19 @@ standardise_treatment <- function(dataframe){
         dataframe <- dplyr::mutate(dataframe,
                                    co2_plot = ifelse(grepl("CO2", .data[[name]], ignore.case = TRUE),
                                                      "Y", .data[["co2_plot"]]))
+        # Create a vector that will contain all accepted treatment names to permit the detection of non-accepted names
+        standard_treats <- vector("character")
         # For each treatment type in treatment list, find all examples of each treatment and ensure they
         # are all named as the first example in that treatment vector
         for (treat in treatment_list){
             dataframe <- dplyr::mutate(dataframe, "{name}" := ifelse(.data[[name]] %in% treat,
                                                                      treat[1], .data[[name]]))
+            # append standardised treatment name to standard_treats
+            standard_treats <- append(standard_treats, treat[1])
         }
+        # remove all non-standard treatment names
+        dataframe <- mutate(dataframe, "{name}" := ifelse(!.data[[name]] %in% standard_treats,
+                                                          NA, .data[[name]]))
     }
     dataframe
 }

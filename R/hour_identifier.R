@@ -84,10 +84,11 @@ hour_identifier <- function(dataframe, is_day = NULL, is_year = NULL, return_fra
     }
     # Amend is_hour depending on whether a dataframe containing the fractional_day column is
     # to be returned
-    if (return_fractional_day == FALSE){
+    if (return_fractional_day == FALSE & sum(is_hour) > 0){
         # If no fractional_day column is to be returned, remove it's entry from is_hour
         is_hour <- is_hour[1:(length(is_hour) - 1)]
-    } else {
+    } 
+    if (return_fractional_day == TRUE){
     # Return a list containing both the logical vector is_hour, and the dataframe updated
     # with a fractional day column
     is_hour <- list(is_hour, dataframe)

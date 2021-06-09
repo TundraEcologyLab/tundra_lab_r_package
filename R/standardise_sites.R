@@ -85,7 +85,7 @@ standardise_sites <- function(dataframe){
 determine_annex <- function(dataframe){
 # determine list of rows of dataframe
     rows <- 1:length(dataframe[[1]])
-# Itterate through rows, greping for "ann" across all columns. Return TRUE for every row
+# Iterate through rows, greping for "ann" across all columns. Return TRUE for every row
     # resulting in at least one hit, else FALSE
     is_annex <- sapply(rows, label_annex,
            dataframe = dataframe)

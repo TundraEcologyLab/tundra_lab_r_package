@@ -43,7 +43,7 @@ add_date <- function(dataframe, is_day = NULL, is_year = NULL, is_hour = NULL){
     # amend date to accurately reflect the day data contained in dataframe
     date <- lubridate::`yday<-`(date, as.numeric(dataframe[is_day][[1]]))
     # Add date column at end of dataframe, removing groups to make it possible
-    dataframe <- ungroup(dataframe)
-    dataframe <- dataframe %>% dplyr::mutate(date = date)
+    dataframe <- dplyr::ungroup(dataframe)
+    dataframe <- dplyr::mutate(dataframe, date = date)
     dataframe
 }

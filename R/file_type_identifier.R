@@ -43,7 +43,7 @@ file_type_identifier <- function(file_path){
         return(",")
     }
     if (!not_spaces & not_commas){
-        return(" ")
+        return("")
     }
 
     # If the number of columns predicted is not > 3 at least 90% of the time, set
@@ -60,7 +60,7 @@ file_type_identifier <- function(file_path){
         return(",")
     }
     if (!not_spaces & not_commas){
-        return(" ")
+        return("")
     }
 
     # Reduce spaces and commas to their unique values
@@ -81,7 +81,7 @@ file_type_identifier <- function(file_path){
         return(",")
     }
     if (!not_spaces & not_commas){
-        return(" ")
+        return("")
     }
     # If it was not possible to determine file type, predict CSV
     return(",")

@@ -23,5 +23,5 @@ then the data will be split into otc and snow treatment columns. If a mixed colu
 as a dedicated snow or otc column this will cause the function to crash as it is not possible to
 determine which data is to be kept. Any time a mixed otc/snow column is found a warning file is
 produced in the output_dir containing the file_path of the original data. This is because it is
-dificult to determine if "control" should belong to snow or otc.
+difficult to determine if "control" should belong to snow or otc.
 }

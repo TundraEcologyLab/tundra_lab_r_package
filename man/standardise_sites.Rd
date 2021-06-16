@@ -12,7 +12,11 @@ site names standardised}
 }
 \description{
 A function which accepts a dataframe, standardises the names found within the column headed
-"site", and returns that dataframe. The sites which are currently attempted to be standardised are:
+"site", and returns that dataframe. If the name of the dome site is subset with "d" or "g",
+the letter is appended to the plot number. If any site is identified as belonging to Anne then
+"Annex_" is prepended to the site name if not already present.
+The sites which are currently attempted to be standardised are:
+Dome
 Sax_opp,
 Fert,
 Beach_Ridge,
@@ -24,5 +28,6 @@ Annex_Willow,
 Annex_Cassiope,
 Annex_BS_Willow,
 Annex_BS_Cassiope,
-Annex_Migration
+Annex_Migration,
+Baker_Lake
 }

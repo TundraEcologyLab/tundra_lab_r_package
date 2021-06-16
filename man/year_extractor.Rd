@@ -27,7 +27,7 @@ Certain dates will throw multiple years as they can be read in different formats
 prevented by selecting a date format, which ensures all dates are read in only one way. Regardless
 the date format, 4 digit years not directly touching other digits will always be returned. To further
 prevent miss-atributation, only years 1980-2029 will be returned. Setting breaks to TRUE means that
-only years issolated from other words are returned, for example "summer2012" would not produce a hit
+only years isolated from other words are returned, for example "summer2012" would not produce a hit
 but "summer_2012" or simply "2012" would. Setting unique to FALSE means all hits are returned, which
 is useful for counting them. WARNING - if unique is set to FALSE, and a specific date format is not
 selected, then extra hits may be generated, for example 01022003 will produce two hits, one as first

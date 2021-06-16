@@ -17,11 +17,12 @@ At this point, if A cassiope or Willow site contains A-C in its plot number, the
 site is named Annex_BS.
 Next, any plot number containing A, R, or C and not belonging to an Annex or Farm site, has
 "addition", "removal", or "control" added to its snow_treatment column. Finally, any plot not
-belonging to an Annex or Farm site has any letters removed from its plot number. Column name
+belonging to an Annex, Farm, or Dome site has any letters removed from its plot number. Column name
 standardisation should be performed before using this function. The required column names are:
 "site"
 "plot"
 "sect"
+"otc_treatment"
 "snow_treatment" - This column will be added if it is not already present - however,
 find_treatment_cols should be applied to the dataframe before the standardisation of plot number.
 }

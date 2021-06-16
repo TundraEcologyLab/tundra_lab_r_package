@@ -4,11 +4,14 @@
 \alias{create_file_reader_function}
 \title{Create function for reading files identified in text document}
 \usage{
-create_file_reader_function(files)
+create_file_reader_function(files, path_only = FALSE)
 }
 \arguments{
 \item{files}{Either the path to a warning text document produced by some other tundra
 functions, or a list of file paths}
+
+\item{path_only}{If TRUE, only the file path is returned, not the data contained within that file
+path. This is included to facilitate the probe_errors function.}
 }
 \description{
 A function which is designed to help efficiently read the files identified by the
@@ -19,5 +22,7 @@ document. Files are loaded using the load_file function. Calling the outputed fu
 after every file has been read will result in the first file being read again. When reading
 the text document, this function will ignore anything preceding the last colon on a line,
 if any colon is present. Alternatively, a list of file paths can be provided as input in place
-of a file path to a text document containing the paths.
+of a file path to a text document containing the paths. path_only can be set to TRUE, resulting in
+only the file path being returned (the file is not its self loaded). This is mostly convenient
+for use with the probe_errors function
 }

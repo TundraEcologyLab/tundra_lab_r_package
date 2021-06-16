@@ -19,7 +19,7 @@
 #'are encountered
 #'@param file_path The file_path that will be used to describe to origin of the data in a potential
 #'warning file if mixed treatment columns are encountered
-#' @export
+#'@export
 
 standardise_plots <- function(dataframe, output_dir, file_path){
     # Ensure all column names related to plot identification have the expected names
@@ -53,13 +53,24 @@ standardise_plots <- function(dataframe, output_dir, file_path){
                                                  .data[["plot"]]
     ))
 
-    # Run the get_plot_ID function on every row of the dataframe to give each row a unique plot_ID
-    dataframe <- dataframe %>% rowwise() %>%
-        mutate(plot_id = get_plot_ID(.data[["site"]],
-                                     .data[["plot"]],
-                                     .data[["otc_treatment"]],
-                                     .data[["snow_treatment"]],
-                                     plot_list))
+    # Add row_number to dataframe to line up the results of get_plot_ID with the data
+    dataframe <- dplyr::mutate(dataframe, .row = 1:nrow(dataframe))
+    # Produce a dataframe containing the unique plot IDs, and the coresponding row number in dataframe
+    plot_ids <- dataframe %>% group_by(site, plot, otc_treatment, snow_treatment) %>%
+        group_modify(~ {data.frame(.row = .x$.row,  plot_id = rep(get_plot_ID(.y$site,
+                                                                            .y$plot,
+                                                                            .y$otc_treatment,
+                                                                            .y$snow_treatment),
+                                                                nrow(.x))
+                                   )
+            })
+    # Merge the dataframe with the plot_ids
+    dataframe <- merge(dataframe, plot_ids)
+    
     dataframe <- ungroup(dataframe)
+    # return dataframe to original sorting
+    dataframe <- arrange(dataframe, .row)
+    # remove the .row column added as a key for the asigning of the plot_ids
+    dataframe <- dplyr::select(dataframe, !.row)
     dataframe
 }

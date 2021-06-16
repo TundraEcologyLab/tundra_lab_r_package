@@ -78,35 +78,31 @@ standardise_sites <- function(dataframe){
                       "Baker_Lake", .data[["site"]]))
 }
 
-#' A function which first checks every row of the dataframe to see if "ann" can be found within
+#' A function which first checks every row of the dataframe to see if "anne" can be found within
 #' any of its columns. If so that row is marked as belonging to an Annex site. All rows deemed to
 #' be belonging to annex sites in this way have "Annex_" prepended to their site names if they don't
 #' already have so.
 determine_annex <- function(dataframe){
-# determine list of rows of dataframe
-    rows <- 1:length(dataframe[[1]])
-# Iterate through rows, greping for "ann" across all columns. Return TRUE for every row
-    # resulting in at least one hit, else FALSE
-    is_annex <- sapply(rows, label_annex,
-           dataframe = dataframe)
-    # Add annex test to the dataframe
-    dataframe["test_for_annex"] <- is_annex
+    # determine list of columns
+    cols <- names(dataframe)
+    # Create a column to store whether or not a row contains a reference to Anne
+    dataframe <- dplyr::mutate(dataframe, is_annex = NA)
+    # Iterate through columns, changing the value of is_annex to TRUE if "anne" is found in any column
+    for (name in cols){
+        dataframe <- dplyr::mutate(dataframe, is_annex = ifelse(grepl("anne", .data[[name]], ignore.case = TRUE),
+                                                                TRUE, is_annex))
+    }
+    # Add FALSE to any is_annex value that isn't TRUE to remove NA values
+    dataframe <- mutate(dataframe, is_annex = ifelse(is.na(.data[["is_annex"]]), FALSE, is_annex))
+    
     # Prepend "Annex_" to every identified annex site that is not already so identified
     dataframe <- mutate(dataframe,
                         site = ifelse(!grepl("ann", .data[["site"]], ignore.case = TRUE)&
-                                          .data[["test_for_annex"]] == TRUE,
+                                          .data[["is_annex"]] == TRUE,
                                       paste0("Annex_", .data[["site"]]), .data[["site"]]))
     # Remove annex test from dataframe
-    dataframe <- select(dataframe, !test_for_annex)
+    dataframe <- select(dataframe, !is_annex)
     dataframe
 }
 
-# Return TRUE if the dataframe in given row contains "ann" across any of its columns
-label_annex <- function(dataframe, row){
-    annex_plot <- FALSE
-    row_data <- unname(unlist(dataframe[row,]))
-    if (sum(grepl("anne", row_data, ignore.case = TRUE)) > 0){
-        annex_plot <- TRUE
-    }
-    annex_plot
-}
+

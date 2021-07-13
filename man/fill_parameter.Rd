@@ -10,6 +10,7 @@ fill_parameter(
   output_dir,
   file_path,
   col_name,
+  breaks = TRUE,
   parameter_names = col_name,
   ...
 )
@@ -29,6 +30,8 @@ detailing all files for which this function was unsuccessful}
 
 \item{col_name}{The name of the column that, if present, should already contain the parameter in
 question}
+
+\item{breaks}{Does the extractor function have a breaks option}
 
 \item{parameter_names}{A character vector containing strings detailing all key words that should
 be searched for when looking for metadata}

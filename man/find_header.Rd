@@ -10,12 +10,25 @@ find_header(file_path, sep, multi_header = FALSE)
 \item{file_path}{A path to the file that is to be checked for a header line}
 
 \item{sep}{A character vector containing the character used to deliminate the file}
+
+\item{multi_header}{Is the file is anticipated to consist of multiple dataframes on top of each
+other separated by header lines, and should all headers be detected?}
 }
 \description{
 A function which accepts a file_path and separator and attempts to Find the position
 of the column headers, if any, within that file. It ignores meaningless header names
-"...(number)" and "X(number)". A row is assumed to be a header line if columns 2,3,
-and 4 do not contain numerical data. up to the first 10 rows are checked. If a header is
-found, the number of rows to skip while reading in the file to make the header the first
+"...(number)" and "X(number)". A row is assumed to be a header line if columns 2,3, 4,
+and 5 do not contain numerical data. up to the first 10 rows are checked. Otherwise, or if more than 2
+potential headers are detected, then a second approach is tried. The first five columns are checked
+for repeating data (these columns often include data such as site or date which can be the
+same for many rows). If repeating data is found (at least five repetitions), then the row
+immediately before the first instance of the repetitive data is considered to be the header
+line. If this fails, or if the dataframe has less than 5 columns then the string "no header"
+is returned. If multi_header == TRUE (if the file is anticipated to consist
+of multiple dataframes on top of each other separated by header lines) then it is attempted to
+detect all header lines. If more than 10 headers are detected it is assumed to be erroneous and
+and "no header" is returned. The repetitive string approach will not attempt to detect multi_headers
+and so only the first header will be detected if this approach is required.
+If headers are found, the number of rows to skip while reading in the file to make the header the first
 row read is returned. If no header is found the string "no header" is returned.
 }

@@ -20,10 +20,11 @@
 #' question
 #' @param parameter_names A character vector containing strings detailing all key words that should
 #' be searched for when looking for metadata
+#' @param breaks Does the extractor function have a breaks option
 #' @export
 
 
-fill_parameter <- function(dataframe, extractor_function, output_dir, file_path, col_name,
+fill_parameter <- function(dataframe, extractor_function, output_dir, file_path, col_name, breaks = TRUE,
                            parameter_names = col_name, ...){
 
 
@@ -68,7 +69,7 @@ fill_parameter <- function(dataframe, extractor_function, output_dir, file_path,
 
         # Check that the dataframe now contains the parameter, if not, write the filepath to file for future
         # investigation
-        contains_parameter <- parameter_present(dataframe, extractor_function, col_name, ...)
+        contains_parameter <- parameter_present(dataframe, extractor_function, col_name, breaks, ...)
 
         if (!contains_parameter){
             write_lines(file_path, append = TRUE, file = paste0(output_dir, "/missing_", col_name,".txt"))
@@ -89,20 +90,28 @@ fill_parameter <- function(dataframe, extractor_function, output_dir, file_path,
 #' @param extractor_function A function which can search a string, or series of strings for the data
 #' in question and return all examples it finds.
 #' @param col_name A character vector giving the name of the column to search for
+#' @param breaks Does the extractor function have a breaks option
 #' @export
 
-parameter_present <- function(dataframe, extractor_function, col_name, ...){
+parameter_present <- function(dataframe, extractor_function, col_name, breaks = TRUE, ...){
     contains_parameter <- FALSE
     if (col_name %in% names(dataframe)){
         # Find the index for the column containing col_name
         col_index <- which(names(dataframe) == col_name, arr.ind = TRUE)
         # Determine what percentage of the data with col_name fits the description defined within the
         # extractor function
+        if (breaks){
         hit_ratio <- length(extractor_function(dataframe[[col_index]],
                                                breaks = TRUE,
                                                unique = FALSE,
                                                ...))/
             length(dataframe[[col_index]])
+        } else {
+            hit_ratio <- length(extractor_function(dataframe[[col_index]],
+                                                   unique = FALSE,
+                                                   ...))/
+                length(dataframe[[col_index]])
+        }
         # If at least 50% of the data appears correct then consider the dataframe to be correct as is.
         if (hit_ratio > 0.4){contains_parameter <- TRUE}
     }

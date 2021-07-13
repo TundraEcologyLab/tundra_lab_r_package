@@ -93,15 +93,15 @@ determine_annex <- function(dataframe){
                                                                 TRUE, is_annex))
     }
     # Add FALSE to any is_annex value that isn't TRUE to remove NA values
-    dataframe <- mutate(dataframe, is_annex = ifelse(is.na(.data[["is_annex"]]), FALSE, is_annex))
-    
+    dataframe <- dplyr::mutate(dataframe, is_annex = ifelse(is.na(.data[["is_annex"]]), FALSE, is_annex))
+
     # Prepend "Annex_" to every identified annex site that is not already so identified
-    dataframe <- mutate(dataframe,
+    dataframe <- dplyr::mutate(dataframe,
                         site = ifelse(!grepl("ann", .data[["site"]], ignore.case = TRUE)&
                                           .data[["is_annex"]] == TRUE,
                                       paste0("Annex_", .data[["site"]]), .data[["site"]]))
     # Remove annex test from dataframe
-    dataframe <- select(dataframe, !is_annex)
+    dataframe <- dplyr::select(dataframe, !is_annex)
     dataframe
 }
 

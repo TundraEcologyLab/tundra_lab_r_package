@@ -30,7 +30,8 @@ standardise_treatment <- function(dataframe){
     # correctly. In each case, the name is standardised to the first entry in the vector.
     OTC <- c("OTC", "T", "W", "W(CO2)", "CO2_T", "OTC (CO2)")
     cover <- c("cover", "Cover", "Cc")
-    control <- c("control", "Pheno", "C", "Cp", "CO2_C", "Control", "Control (CO2)", "Control(CO2)")
+    control <- c("control", "Pheno", "C", "Cp", "CO2_C", "Control", "Control (CO2)", "Control(CO2)",
+                 "ctr", "CTR", "CTL", "ctl", "CON", "con")
     addition <- c("addition", "snow addition", "A", "Add")
     removal <- c("removal", "snow removal", "R", "Rem")
     low <- c("low", "Low", "LOW")
@@ -82,7 +83,7 @@ standardise_treatment <- function(dataframe){
             standard_treats <- append(standard_treats, treat[1])
         }
         # remove all non-standard treatment names
-        dataframe <- mutate(dataframe, "{name}" := ifelse(!.data[[name]] %in% standard_treats,
+        dataframe <- dplyr::mutate(dataframe, "{name}" := ifelse(!.data[[name]] %in% standard_treats,
                                                           NA, .data[[name]]))
     }
     dataframe

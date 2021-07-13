@@ -24,6 +24,13 @@
 standardise_plots <- function(dataframe, output_dir, file_path){
     # Ensure all column names related to plot identification have the expected names
     dataframe <- standardise_plot_col_names(dataframe, output_dir, file_path)
+    # If no site or plot column is present then throw an error, as can not continue without such data
+    if (!"site" %in% names(dataframe)){
+        stop("dataframe does not contain a site column")
+    }
+    if (!"plot" %in% names(dataframe)){
+        stop("dataframe does not contain a plot column")
+    }
     # Ensure all sites have the same standardised names found in the plot_names dataframe
     dataframe <- standardise_sites(dataframe)
     # Ensure the data within the plot number is standardised, and moved to other columns as appropriate
@@ -41,12 +48,12 @@ standardise_plots <- function(dataframe, output_dir, file_path){
     needed_cols <- c("site", "plot", "otc_treatment", "snow_treatment")
     for (needed_col in needed_cols){
         if (!needed_col %in% names(dataframe)){
-            dataframe <- mutate(dataframe, "{needed_col}" := NA)
+            dataframe <- dplyr::mutate(dataframe, "{needed_col}" := NA)
         }
     }
 
     # Correct for CO2. If CO2 is present and plot number is 1-4, change to 11-14.
-    dataframe <- mutate(dataframe, plot = ifelse(grepl("^[1-4]$", .data[["plot"]])&
+    dataframe <- dplyr::mutate(dataframe, plot = ifelse(grepl("^[1-4]$", .data[["plot"]])&
                                                       !is.na(.data[["co2_plot"]])&
                                                      .data[["co2_plot"]] == "Y",
                                                  sub("([1-4])", "1\\1", .data[["plot"]]),
@@ -56,8 +63,8 @@ standardise_plots <- function(dataframe, output_dir, file_path){
     # Add row_number to dataframe to line up the results of get_plot_ID with the data
     dataframe <- dplyr::mutate(dataframe, .row = 1:nrow(dataframe))
     # Produce a dataframe containing the unique plot IDs, and the coresponding row number in dataframe
-    plot_ids <- dataframe %>% group_by(site, plot, otc_treatment, snow_treatment) %>%
-        group_modify(~ {data.frame(.row = .x$.row,  plot_id = rep(get_plot_ID(.y$site,
+    dataframe <- dplyr::group_by(dataframe, site, plot, otc_treatment, snow_treatment)
+    plot_ids <- dplyr::group_modify(dataframe, ~ {data.frame(.row = .x$.row,  plot_id = rep(get_plot_ID(.y$site,
                                                                             .y$plot,
                                                                             .y$otc_treatment,
                                                                             .y$snow_treatment),
@@ -66,10 +73,10 @@ standardise_plots <- function(dataframe, output_dir, file_path){
             })
     # Merge the dataframe with the plot_ids
     dataframe <- merge(dataframe, plot_ids)
-    
-    dataframe <- ungroup(dataframe)
+
+    dataframe <- dplyr::ungroup(dataframe)
     # return dataframe to original sorting
-    dataframe <- arrange(dataframe, .row)
+    dataframe <- dplyr::arrange(dataframe, .row)
     # remove the .row column added as a key for the asigning of the plot_ids
     dataframe <- dplyr::select(dataframe, !.row)
     dataframe

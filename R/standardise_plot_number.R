@@ -20,13 +20,13 @@
 #'
 
 standardise_plot_number <- function(dataframe){
-    # If the column snow_treatment is not present, create one filled with NA
-    if (!"snow_treatment" %in% names(dataframe)){
-        dataframe <- dplyr::mutate(dataframe, snow_treatment = NA)
-    }
-    # If the column co2_plot is not present, create one filled with NA
-    if (!"co2_plot" %in% names(dataframe)){
-        dataframe <- dplyr::mutate(dataframe, co2_plot = NA)
+    # Ensure that if any of the 3 columns needed to run the standardise_plot_number function are missing
+    # that they are added, filled NA
+    needed_cols <- c("co2_plot", "otc_treatment", "snow_treatment")
+    for (needed_col in needed_cols){
+        if (!needed_col %in% names(dataframe)){
+            dataframe <- dplyr::mutate(dataframe, "{needed_col}" := NA)
+        }
     }
     # determine if there is a section column. If there is, and that column contains letters A-C, append
     # the letters to the plot numbers in the plot column and then remove the section column
@@ -38,16 +38,27 @@ standardise_plot_number <- function(dataframe){
                                                  .data[["plot"]]))
         dataframe <- dplyr::select(dataframe, !.data[["sect"]])
     }
+    # determine by site if the plot number contains otc_treatment info. If the letters T or W
+    # are present then this indicates otc_treatment info.
+    dataframe <- dplyr::group_by(dataframe, site)
+    dataframe <- dplyr::mutate(
+        dataframe, .has_otc = sum(grepl("T|W", .data[["plot"]], ignore.case = TRUE)) > 0)
+    dataframe <- dplyr::ungroup(dataframe)
+
     dataframe <- dplyr::mutate(
         dataframe,
+        # If the plot number contains otc information then it is extracted into the otc_treatment column
+        otc_treatment = ifelse(.has_otc == TRUE, gsub("\\d", "", .data[["plot"]]), .data[["otc_treatment"]]),
         # Ensure that if CO2 information is stored within co2_plot column that it is moved to its own
         # column
         co2_plot = ifelse(grepl("co2", .data[["plot"]], ignore.case = TRUE), "Y", .data[["co2_plot"]]),
         # Ensure that any Cassiope or Willow site with letters A-C contained within
-        # their plot number are identified as an Annex_BS site, unless the c is from co2
+        # their plot number are identified as an Annex_BS site, unless the c is from co2 or they contain
+        # otc information
         site = ifelse(grepl("cass|will", .data[["site"]], ignore.case = TRUE)&
                           grepl("[A-C]", .data[["plot"]], ignore.case = TRUE)&
-                          !grepl("co2", .data[["plot"]], ignore.case = TRUE),
+                          !grepl("co2", .data[["plot"]], ignore.case = TRUE) &
+                          .has_otc == FALSE,
                       sub(".*(Cassiope|Willow).*", "Annex_BS_\\1",
                           .data[["site"]], ignore.case = TRUE),
                       .data[["site"]]),
@@ -67,14 +78,17 @@ standardise_plot_number <- function(dataframe){
         # this information is moved to the snow_treatment column
         snow_treatment = ifelse(grepl("A", .data[["plot"]], ignore.case = TRUE)&
                                     !grepl("annex|farm", .data[["site"]], ignore.case = TRUE)&
+                                    .has_otc == FALSE &
                                     is.na(.data[["snow_treatment"]]),
                                 "addition", .data[["snow_treatment"]]),
         snow_treatment = ifelse(grepl("R", .data[["plot"]], ignore.case = TRUE)&
                                     !grepl("annex|farm", .data[["site"]], ignore.case = TRUE)&
+                                    .has_otc == FALSE &
                                     is.na(.data[["snow_treatment"]]),
                                 "removal", .data[["snow_treatment"]]),
         snow_treatment = ifelse(grepl("C", .data[["plot"]], ignore.case = TRUE)&
                                     !grepl("annex|farm", .data[["site"]], ignore.case = TRUE)&
+                                    .has_otc == FALSE &
                                     is.na(.data[["snow_treatment"]]),
                                 "control", .data[["snow_treatment"]]),)
     # Remove all letters from plot numbers, except for Annex_BS, Farm, or Dome sites which
@@ -90,6 +104,8 @@ standardise_plot_number <- function(dataframe){
                       gsub("[^0-9]", "", .data[["plot"]], ignore.case = TRUE),
                       .data[["plot"]])
     )
+    # remove the .has_otc column from dataframe
+    dataframe <- dplyr::select(dataframe, !.has_otc)
 
     dataframe
 }

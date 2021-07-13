@@ -3,12 +3,20 @@
 \name{search_dataframe_for_header}
 \alias{search_dataframe_for_header}
 \title{A function which takes a dataframe as input, and returns the row number where it
-has detected a posible header line. A line is considered to be a header if in rows
-2,3, and 4 it contains non-numeric, non-blank data. If 2 potential header lines are
+has detected a possible header line. A line is considered to be a header if in rows
+2,3, 4 and 5 it contains non-numeric, non-blank data. If 2 potential header lines are
 found consecutively, the upper line is checked for known meaningless headers (V1-9, X1-9
 ...1-9), and if so the lower row is returned as header. Otherwise, or if more than 2
-potential headers are detected or dataframe has less than 4 columns, then the character
-string "no header" is returned.}
+potential headers are detected, then a second approach is tried. The first five columns are checked
+for repeating data (these columns often include data such as site or date which can be the
+same for many rows). If repeating data is found (at least five repetitions), then the row
+immediately before the first instance of the repetitive data is considered to be the header
+line. If this fails, or if the dataframe has less than 5 columns then the string "no header"
+is returned. If multi_header == TRUE (if the file is anticipated to consist
+of multiple dataframes on top of each other separated by header lines) then a list of row indices for
+each header line is returned. If more than 10 headers are detected it is assumed to be erroneous and
+and "no header" is returned. The repetitive string approach will not attempt to detect multi_headers
+and so only the first header will be detected if this approach is required}
 \usage{
 search_dataframe_for_header(dataframe, search_limit = 10, multi_header = FALSE)
 }
@@ -19,13 +27,24 @@ within its data}
 \item{search_limit}{The number of rows from the top to check for a header. Defaults to
 10. If the limit is set higher than the number of rows in dataframe then all rows are
 checked}
+
+\item{multi_header}{Is the file is anticipated to consist of multiple dataframes on top of each
+other separated by header lines, and should all headers be detected?}
 }
 \description{
 A function which takes a dataframe as input, and returns the row number where it
-has detected a posible header line. A line is considered to be a header if in rows
-2,3, and 4 it contains non-numeric, non-blank data. If 2 potential header lines are
+has detected a possible header line. A line is considered to be a header if in rows
+2,3, 4 and 5 it contains non-numeric, non-blank data. If 2 potential header lines are
 found consecutively, the upper line is checked for known meaningless headers (V1-9, X1-9
 ...1-9), and if so the lower row is returned as header. Otherwise, or if more than 2
-potential headers are detected or dataframe has less than 4 columns, then the character
-string "no header" is returned.
+potential headers are detected, then a second approach is tried. The first five columns are checked
+for repeating data (these columns often include data such as site or date which can be the
+same for many rows). If repeating data is found (at least five repetitions), then the row
+immediately before the first instance of the repetitive data is considered to be the header
+line. If this fails, or if the dataframe has less than 5 columns then the string "no header"
+is returned. If multi_header == TRUE (if the file is anticipated to consist
+of multiple dataframes on top of each other separated by header lines) then a list of row indices for
+each header line is returned. If more than 10 headers are detected it is assumed to be erroneous and
+and "no header" is returned. The repetitive string approach will not attempt to detect multi_headers
+and so only the first header will be detected if this approach is required
 }

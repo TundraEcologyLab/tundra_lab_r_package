@@ -90,10 +90,10 @@ site_extractor <- function(string, unique = TRUE){
   if (count > 1){
     stop("Multiple site names detected within same string")
   }
-  # if multiple strings have been suplied then run the extract_site function individually on each
+  # if multiple strings have been supplied then run the extract_site function individually on each
   # string
   } else {
-    site <- lapply(string, extract_site)
+    site <- lapply(string, site_extractor)
     site <- unlist(site)
   }
   # If unique is set to TRUE then return only unique entries

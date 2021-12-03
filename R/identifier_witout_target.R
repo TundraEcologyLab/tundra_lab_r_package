@@ -15,6 +15,11 @@
 #' making the text file described in output_dir
 #' @export
 identifier_without_target <- function(dataframe, output_dir, file_path){
+    # If dataframe contains no data then return FALSE for all columns
+    if (nrow(dataframe) == 0){
+        is_identifier <- rep(FALSE, length(dataframe))
+        return(is_identifier)
+    }
     is_identifier <- vector("logical")
     # The identifier column always occurs near the start of the file. Check only the first
     # five columns, or length of the dataframe, whichever is smaller

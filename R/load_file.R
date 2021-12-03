@@ -25,43 +25,36 @@ load_file <- function(file_path, sep = NULL, split_file = FALSE, multi_header = 
     }
     # If file is not to be split, load the whole file
     if (!split_file){
-        # Determine the number of rows to skip such that the first row is the header line
-        # Can return a list of skips if multi_header = TRUE
-        skip <- find_header(file_path, sep, multi_header)
-        # Load the data between detected header lines into separate dataframes. If only one header
-        # load all data under the header.
-        dataframe <- sapply(seq_along(skip), FUN = load,
-                            skip = skip,
-                            file_path = file_path,
-                            sep = sep
-        )
-        # If only one dataframe then return as a dataframe rather than a list
-        if (length(dataframe) == 1){
-            dataframe <- as.data.frame(dataframe)
-        }
+        dataframe <- standard_load_procedure(file_path, sep, multi_header)
 
     } else {
         # If files are to be split, produce a list of dataframes - each dataframe
         # containing all rows with the same number of columns
 
         # Determine length of every row in file
-        row_lengths <- count.fields(file_path, sep, '""')
+        row_lengths <- count.fields(file_path, sep, quote = '"', comment.char = "")
         # Determine unique row lengths in file
         unique_row_lengths <- unique(sort(row_lengths))
 
+        # If all rows are of the same length then load as normal, else load lines with
+        # different lengths separately and return a list of differently lengthed dataframes
 
-        # create list to store segregated file parts
-        dataframe <- list()
-        # open connection to file
+        if (length(unique_row_lengths) == 1){
+            dataframe <- standard_load_procedure(file_path, sep, multi_header)
+        } else {
 
-        # read data into dataframes, grouped by the unique_row_lengths
-        dataframe <- lapply(unique_row_lengths,
-                            function(file, row_lengths, sep, unique_row_length){
-                                load_specific_row_length(file, row_lengths, sep, unique_row_length)},
-                            file = file_path,
-                            row_lengths = row_lengths,
-                            sep = sep)
 
+            # create list to store segregated file parts
+            dataframe <- list()
+
+            # read data into dataframes, grouped by the unique_row_lengths
+            dataframe <- lapply(unique_row_lengths,
+                                function(file, row_lengths, sep, unique_row_length){
+                                    load_specific_row_length(file, row_lengths, sep, unique_row_length)},
+                                file = file_path,
+                                row_lengths = row_lengths,
+                                sep = sep)
+        }
 
 
     }
@@ -69,6 +62,24 @@ load_file <- function(file_path, sep = NULL, split_file = FALSE, multi_header = 
     # while (sum(grepl("([^\\.\\.]+)\\.\\.+([^\\.\\.]+)", names(dataframe))) > 0){
     #     names(dataframe) <- gsub("([^\\.\\.]+)\\.\\.+([^\\.\\.]+)", "\\1_\\2", names(dataframe))
     #}
+    dataframe
+}
+
+standard_load_procedure <- function(file_path, sep, multi_header){
+    # Determine the number of rows to skip such that the first row is the header line
+    # Can return a list of skips if multi_header = TRUE
+    skip <- find_header(file_path, sep, multi_header)
+    # Load the data between detected header lines into separate dataframes. If only one header
+    # load all data under the header.
+    dataframe <- sapply(seq_along(skip), FUN = load,
+                        skip = skip,
+                        file_path = file_path,
+                        sep = sep
+    )
+    # If only one dataframe then return as a dataframe rather than a list
+    if (length(dataframe) == 1){
+        dataframe <- as.data.frame(dataframe)
+    }
     dataframe
 }
 
@@ -87,7 +98,10 @@ load <- function(skip, file_path, sep, skip_index){
         # If the header does not have a column name for every column with data then read.table will
         # return an error. This will result in dataframe having a length of 0. The quote is set to "\""
         # to avoid apostorphes confusing the loading of file (the default for quote is both double and
-        # single quotes). If no quote is set then commas within cells will confuse loading
+        # single quotes). If no quote is set then commas within cells will confuse loading. comment.char
+        # by defualt in read.table is set to "#", which means A # in a file will lead to the data beyond
+        # it on that line being ignored, which can lead to the file failing to load at all. To avoid this
+        # comment.char is set blank.
         dataframe <- data.frame()
         try(dataframe <- read.table(file = file_path,
                                     skip = skip,
@@ -99,7 +113,8 @@ load <- function(skip, file_path, sep, skip_index){
                                     check.names = FALSE,
                                     row.names = NULL,
                                     nrows = n_rows,
-                                    quote = "\""
+                                    quote = "\"",
+                                    comment.char = ""
 
         ))
 
@@ -108,10 +123,13 @@ load <- function(skip, file_path, sep, skip_index){
             # count.fields provides the number of columns per line. This is required to prevent R
             # from truncating later columns that have additional columns. count.fields returns NA
             # when a field contains a character string with cariage returns.
-            # The manual naming of columns to the length of the longest row ensures all data is loaded
+            # The manual naming of columns to the length of the longest row ensures all data is loaded.
+            # comment.char by defualt in read.table is set to "#", which means A  in a file will lead
+            # to the data beyond it on that line being ignored, which can lead to the file failing to
+            # load at all. To avoid this comment.char is set blank.
             number_of_cols <- max(
-                count.fields(file_path, sep = sep, quote = '""')[!is.na(count.fields(
-                    file_path, sep = sep, quote = '""'))])
+                count.fields(file_path, sep = sep, quote = '"', comment.char = "")[!is.na(count.fields(
+                    file_path, sep = sep, quote = '"', comment.char = ""))])
             dataframe <- read.table(file = file_path,
                                     header = FALSE,
                                     col.names = paste0("V", seq_len(number_of_cols)),
@@ -122,7 +140,8 @@ load <- function(skip, file_path, sep, skip_index){
                                     check.names = FALSE,
                                     row.names = NULL,
                                     nrows = n_rows,
-                                    quote = "\""
+                                    quote = "\"",
+                                    comment.char = ""
 
             )
         }
@@ -131,8 +150,11 @@ load <- function(skip, file_path, sep, skip_index){
         # from truncating later columns that have additional columns. count.fields returns NA
         # when a field contains a character string with cariage returns.
         # The manual naming of columns to the length of the longest row ensures all data is loaded
+        # comment.char by defualt in read.table is set to "#", which means A  in a file will lead
+        # to the data beyond it on that line being ignored, which can lead to the file failing to
+        # load at all. To avoid this comment.char is set blank.
         number_of_cols <- max(
-            count.fields(file_path, sep = sep, quote = '""')[!is.na(count.fields(
+            count.fields(file_path, sep = sep, quote = '"', comment.char = "")[!is.na(count.fields(
                 file_path, sep = sep, quote = '""'))])
         dataframe <- read.table(file = file_path,
                                 header = FALSE,
@@ -144,7 +166,8 @@ load <- function(skip, file_path, sep, skip_index){
                                 check.names = FALSE,
                                 row.names = NULL,
                                 nrows = n_rows,
-                                quote = "\""
+                                quote = "\"",
+                                comment.char = ""
         )
     }
     # Clean the column names of the loaded dataframe. If multiple columns exist with the same name

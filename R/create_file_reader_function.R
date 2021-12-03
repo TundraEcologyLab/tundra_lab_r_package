@@ -13,19 +13,21 @@
 #' for use with the probe_errors function
 #' @param files Either the path to a warning text document produced by some other tundra
 #' functions, or a list of file paths
+#' @param from_file TRUE or FALSE, is the files parameter a file_path to a text file containing file paths
+#' to the files to be loaded
 #' @param path_only If TRUE, only the file path is returned, not the data contained within that file
 #' path. This is included to facilitate the probe_errors function.
 #' @export
 
 
-create_file_reader_function <- function(files, path_only = FALSE){
-    if (is.list(files)){
-        file_list <- unlist(files)
-    } else {
+create_file_reader_function <- function(files, from_file = FALSE, path_only = FALSE){
+    if (from_file) {
     # read the contents of the text document
     file_list <- readr::read_lines(files, skip_empty_rows = TRUE)
     # eliminate any text preceding a colon
     file_list <- sub(".*: *", "", file_list)
+    } else {
+        file_list <- files
     }
     # number of files identified in file list
     number_of_files <- length(file_list)

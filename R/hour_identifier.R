@@ -77,17 +77,14 @@ hour_identifier <- function(dataframe, is_day = NULL, is_year = NULL, return_fra
         # Move to next column of dataframe
         i <- i + 1
     }
-    # Extend is_hour to the full length of the dataframe if the initial dataframe was
-    # longer than 8 columns
+    # Extend is_hour to the full length of the dataframe if it isn't already. This will be
+    # necessary if the initial dataframe length was greater than 8, as only the first 8 columns
+    # are checked for hour data. This will also be needed if return_fractional_day == TRUE, as a
+    # new column has been added to the dataframe
     if (length(dataframe) - length(is_hour) > 0){
     is_hour <- append(is_hour, rep(FALSE, length(dataframe) - length(is_hour)))
     }
-    # Amend is_hour depending on whether a dataframe containing the fractional_day column is
-    # to be returned
-    if (return_fractional_day == FALSE & sum(is_hour) > 0){
-        # If no fractional_day column is to be returned, remove it's entry from is_hour
-        is_hour <- is_hour[1:(length(is_hour) - 1)]
-    } 
+
     if (return_fractional_day == TRUE){
     # Return a list containing both the logical vector is_hour, and the dataframe updated
     # with a fractional day column

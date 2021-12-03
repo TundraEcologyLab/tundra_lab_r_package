@@ -26,25 +26,65 @@ load_specific_row_length <- function(file_path, row_lengths, sep = ",", row_leng
     # open connection to file
     con <- file(file_path)
     open(con)
-    # Create a list of all the individual rows with the correct length
+
+    # If the lengths of the rows are 1 and there are more than 5 rows then, at least under certain
+    # circumstances, read.table throws the error "first five rows are empty: giving up", apparently
+    # even though there is data in the cells. To get around this, if the length of the row is 1 then
+    # use readlines instead, and then manually create a dataframe to contain the data
+
+
+    data_list <- NA
+    # Create a list of all the individual rows with the correct length. read.table can, for reasons
+    # unknown, determine that a row has an extra blank column. The rest of the rows remain the same
+    # size and so it can't find data for the imagined column in these rows and throws the error
+    # "first five rows are empty: giving up". Setting fill to TRUE gets around this problem at the
+    # expense of accepting a ghost blank column in the loaded dataframe.
+    # comment.char by default in read.table is set to "#", which means A  in a file will lead
+    # to the data beyond it on that line being ignored, which can lead to the file failing to
+    # load at all. To avoid this comment.char is set blank.
     data_list <- lapply(skips, FUN = function(con, sep, skip){
         row <- read.table(file = con,
                           header = FALSE,
                           sep = sep,
                           colClasses = "character",
                           nrows = 1,
-                          skip = skip
+                          skip = skip,
+                          fill = TRUE,
+                          comment.char = ""
         )
     }, con = con, sep = sep)
+
     # close connection
     close(con)
 
-    # combine all the individual rows into one dataframe
-    dataframe <- do.call(rbind, data_list)
+    # if (is.na(data_list)){
+    #   skips <- rows_to_load - 1
+    #     data_list <- lapply(skips, FUN = function(file_path, sep, skip){
+    #         row <- read.table(file = file_path,
+    #                           header = FALSE,
+    #                           sep = sep,
+    #                           colClasses = "character",
+    #                           nrows = 1,
+    #                           skip = skip,
+    #                           fill = TRUE,
+    #                           strip.white = TRUE,
+    #                           check.names = FALSE,
+    #                           quote = "\""
+    #         )
+    #     }, file_path = file_path, sep = sep)
+    # }
+
+
+    # combine all the individual rows into one dataframe. On some occasions read.table
+    # gets confused and returns an extra blank column for some rows. Using rbind.fill permits
+    # this to happen producing the dataframe expected, but with one empty column
+    dataframe <- do.call(plyr::rbind.fill, data_list)
     # convert dataframe to a tibble
     dataframe <- dplyr::as_tibble(dataframe)
     # Adjust dataframe if header line is detected
     dataframe <- reheader_dataframe(dataframe)
+
+    dataframe
 
 }
 #' A function which accepts a dataframe as input. It checks the first 10 rows using the

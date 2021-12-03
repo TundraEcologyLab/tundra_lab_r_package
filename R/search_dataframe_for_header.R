@@ -93,8 +93,9 @@ search_dataframe_for_header <- function(dataframe, search_limit = 10, multi_head
     # If trying to differentiate the header line from the data by looking for numeric and non_numeric
     # data didn't find a header, try searching for repeated strings. Often data will contain a site name,
     # plot number, date etc that is repeated for many entries and this can differentiate the data from the
-    # header line.
-    if (!is.null(numeric_result) & numeric_result == FALSE){
+    # header line. If there are less than 10 rows of data then there is not enough data to be confident of
+    # meaningful repetition and so "no header" is returned
+    if (!is.null(numeric_result) & numeric_result == FALSE & nrow(dataframe) >= 10){
         # rows to check for repeated strings
         rows <- 1:10
         # return TRUE for every row where at least one of the columns 1:5 has a repeating

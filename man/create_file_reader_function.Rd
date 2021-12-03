@@ -4,11 +4,14 @@
 \alias{create_file_reader_function}
 \title{Create function for reading files identified in text document}
 \usage{
-create_file_reader_function(files, path_only = FALSE)
+create_file_reader_function(files, from_file = FALSE, path_only = FALSE)
 }
 \arguments{
 \item{files}{Either the path to a warning text document produced by some other tundra
 functions, or a list of file paths}
+
+\item{from_file}{TRUE or FALSE, is the files parameter a file_path to a text file containing file paths
+to the files to be loaded}
 
 \item{path_only}{If TRUE, only the file path is returned, not the data contained within that file
 path. This is included to facilitate the probe_errors function.}

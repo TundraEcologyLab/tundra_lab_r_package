@@ -41,8 +41,25 @@ solar_identifier <- function(dataframe, file_path, output_dir, W_or_KW = "KW", h
     added_columns <- 0
     # Determine which column contains date data by checking column names
     date_index <- which(grepl("date", names(dataframe), ignore.case = TRUE), arr.ind = TRUE)
-    # If no date column is detected then create one
-    if (length(date_index) == 0){
+    # If only one date column is present check that it is in the date format then set good_date to
+    # TRUE else FALSE
+    if (length(date_index) == 1){
+        good_date <- lubridate::is.Date(dataframe[[date_index]])
+    } else{
+        good_date <- FALSE
+    }
+    # If no date column is detected, or there are multiple making it unclear then create one based
+    # on the detected year and day data. If the one detected date column can not be confirmed to be
+    # in a date format then create a new date column
+    if (!good_date){
+        # change the name of any date column which is not to be used as date information by this
+        # function from "date" to ".date", so that the add_date function does not overwrite a
+        # column already called "date". This function does not return the dataframe, so no change
+        # in name will be permanent.
+        for (index in date_index){
+            names(dataframe)[index] <- paste0(".", names(dataframe[index]))
+        }
+        # Add a date column at the end of the dataframe
         dataframe <- tundra::add_date(dataframe)
         added_columns <- added_columns + 1
         date_index <- length(dataframe)
@@ -67,7 +84,7 @@ solar_identifier <- function(dataframe, file_path, output_dir, W_or_KW = "KW", h
     }
     # convert all column types to numeric, except the date column
     dataframe <- dataframe %>% hablar::convert(
-        hablar::num(!dplyr::matches("date", ignore.case = TRUE)))
+        hablar::num(!dplyr::matches("^date$", ignore.case = TRUE)))
     # For all non-date columns, decide if column contains solar data by checking the data
     # lies in an appropriate range, equals 0 in the winter, and fits a sinosoidal curve
     # through the summer

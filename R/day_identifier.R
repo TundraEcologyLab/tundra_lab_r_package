@@ -13,6 +13,15 @@ day_identifier <- function(dataframe){
   # For each column in dataframe append TRUE to is_day if the column is a list of days
   # and FALSE if it isn't
   for (i in 1:length(dataframe)){
+      # check that column is not named something that clearly identifies it as not a day
+      # for example, plant number can often be an incrementally increasing number
+      col_name <- names(dataframe)[i]
+      if (length(col_name) == 1){
+      if (grepl("plant", col_name, ignore.case = TRUE)){
+          is_day <- append(is_day, FALSE)
+          next
+      }
+      }
     col <- dataframe[[i]] # set col to next column in dataframe
     col <- as.numeric(col) # convert to class numeric to remove all non-numeric data
     col <- col[!is.na(col)] # remove all NA values

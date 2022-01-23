@@ -4,7 +4,14 @@
 \alias{parameter_present}
 \title{Is parameter present?}
 \usage{
-parameter_present(dataframe, extractor_function, col_name, breaks = TRUE, ...)
+parameter_present(
+  dataframe,
+  extractor_function,
+  col_name,
+  breaks = TRUE,
+  full_existing_check = TRUE,
+  ...
+)
 }
 \arguments{
 \item{dataframe}{A dataframe to be examined}
@@ -15,6 +22,10 @@ in question and return all examples it finds.}
 \item{col_name}{A character vector giving the name of the column to search for}
 
 \item{breaks}{Does the extractor function have a breaks option}
+
+\item{full_existing_check}{If FALSE then parameter_present simply checks for a column of the
+correct name. If TRUE then it also uses the extractor function to check that the column is
+actually populated with relevant data}
 }
 \description{
 A function which accepts a dataframe, a column name, and an extractor function:

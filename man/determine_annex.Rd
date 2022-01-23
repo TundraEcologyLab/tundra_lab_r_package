@@ -5,7 +5,8 @@
 \title{A function which first checks every row of the dataframe to see if "anne" can be found within
 any of its columns. If so that row is marked as belonging to an Annex site. All rows deemed to
 be belonging to annex sites in this way have "Annex_" prepended to their site names if they don't
-already have so.}
+already have so. If running standardise_plots, the standardise_plot_number function will later
+identify cassiope and willow sites as annex if "new" is found within plot column.}
 \usage{
 determine_annex(dataframe)
 }
@@ -13,5 +14,6 @@ determine_annex(dataframe)
 A function which first checks every row of the dataframe to see if "anne" can be found within
 any of its columns. If so that row is marked as belonging to an Annex site. All rows deemed to
 be belonging to annex sites in this way have "Annex_" prepended to their site names if they don't
-already have so.
+already have so. If running standardise_plots, the standardise_plot_number function will later
+identify cassiope and willow sites as annex if "new" is found within plot column.
 }

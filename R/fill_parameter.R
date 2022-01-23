@@ -21,17 +21,26 @@
 #' @param parameter_names A character vector containing strings detailing all key words that should
 #' be searched for when looking for metadata
 #' @param breaks Does the extractor function have a breaks option
+#' @param meta_only If TRUE, then only the meta data within the file will be searched, not the file path
+#' @param full_existing_check If FALSE then the check that the data already exists within the dataframe
+#' simply checks for a column of the correct name. If TRUE then it also uses the extractor function to
+#' check that the column is actually populated with relevant data. Must be FALSE when using the
+#' adjacent_extractor function.
 #' @export
 
 
 fill_parameter <- function(dataframe, extractor_function, output_dir, file_path, col_name, breaks = TRUE,
-                           parameter_names = col_name, ...){
+                           parameter_names = col_name, meta_only=FALSE, full_existing_check = TRUE, ...){
 
 
     # If the column already exists, check that it contains the correct data. There are many examples
     # of year appearing as a column header when it was actually a single piece of unfortunately positioned
     # meta data
-    contains_parameter <- parameter_present(dataframe, extractor_function, col_name, ...)
+    contains_parameter <- parameter_present(dataframe,
+                                            extractor_function,
+                                            col_name,
+                                            full_existing_check = full_existing_check,
+                                            ...)
     # Else, remove the erroneous column with name col_name
     if (!contains_parameter){
         dataframe <- select(dataframe, !dplyr::any_of(dplyr::matches(col_name)))
@@ -53,8 +62,9 @@ fill_parameter <- function(dataframe, extractor_function, output_dir, file_path,
         valid_hits <- extractor_function(parameter_lines, ...)
 
         # If no meta data is found within the file, attempt to extract the data from the file path
-        if (length(valid_hits) == 0){
-            valid_hits <- extractor_function(file_path)
+        # unless meta_only == TRUE
+        if (length(valid_hits) == 0 & !meta_only){
+            valid_hits <- extractor_function(file_path, ...)
         }
         # If the extractor function is successful in finding data, either within the file or file_path,
         # Check that the data is consistent, then add it to the dataframe
@@ -69,7 +79,12 @@ fill_parameter <- function(dataframe, extractor_function, output_dir, file_path,
 
         # Check that the dataframe now contains the parameter, if not, write the filepath to file for future
         # investigation
-        contains_parameter <- parameter_present(dataframe, extractor_function, col_name, breaks, ...)
+        contains_parameter <- parameter_present(dataframe,
+                                                extractor_function,
+                                                col_name,
+                                                breaks,
+                                                full_existing_check = full_existing_check,
+                                                ...)
 
         if (!contains_parameter){
             write_lines(file_path, append = TRUE, file = paste0(output_dir, "/missing_", col_name,".txt"))
@@ -91,11 +106,14 @@ fill_parameter <- function(dataframe, extractor_function, output_dir, file_path,
 #' in question and return all examples it finds.
 #' @param col_name A character vector giving the name of the column to search for
 #' @param breaks Does the extractor function have a breaks option
+#' @param full_existing_check If FALSE then parameter_present simply checks for a column of the
+#' correct name. If TRUE then it also uses the extractor function to check that the column is
+#' actually populated with relevant data
 #' @export
 
-parameter_present <- function(dataframe, extractor_function, col_name, breaks = TRUE, ...){
+parameter_present <- function(dataframe, extractor_function, col_name, breaks = TRUE, full_existing_check = TRUE, ...){
     contains_parameter <- FALSE
-    if (col_name %in% names(dataframe)){
+    if (col_name %in% names(dataframe) & full_existing_check){
         # Find the index for the column containing col_name
         col_index <- which(names(dataframe) == col_name, arr.ind = TRUE)
         # Determine what percentage of the data with col_name fits the description defined within the
@@ -114,6 +132,9 @@ parameter_present <- function(dataframe, extractor_function, col_name, breaks = 
         }
         # If at least 50% of the data appears correct then consider the dataframe to be correct as is.
         if (hit_ratio > 0.4){contains_parameter <- TRUE}
+        # If full check is not to be performed and column is present, return TRUE
+    } else if (col_name %in% names(dataframe) & !full_existing_check){
+        contains_parameter <- TRUE
     }
     contains_parameter
 }

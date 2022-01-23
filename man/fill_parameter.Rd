@@ -12,6 +12,8 @@ fill_parameter(
   col_name,
   breaks = TRUE,
   parameter_names = col_name,
+  meta_only = FALSE,
+  full_existing_check = TRUE,
   ...
 )
 }
@@ -35,6 +37,13 @@ question}
 
 \item{parameter_names}{A character vector containing strings detailing all key words that should
 be searched for when looking for metadata}
+
+\item{meta_only}{If TRUE, then only the meta data within the file will be searched, not the file path}
+
+\item{full_existing_check}{If FALSE then the check that the data already exists within the dataframe
+simply checks for a column of the correct name. If TRUE then it also uses the extractor function to
+check that the column is actually populated with relevant data. Must be FALSE when using the
+adjacent_extractor function.}
 }
 \description{
 A function which examines a file's metadata and file path for a given piece of data and,

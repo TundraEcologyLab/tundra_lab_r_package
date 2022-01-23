@@ -26,12 +26,12 @@ find_treatment_cols <- function(dataframe, output_dir, file_path){
 
 
   # The regex used to identify any treatment column. Any column not matching this will be ignored.
-  col_pattern <- "otc|treat|fert"
+  col_pattern <- "otc|treat|fert|trtmt"
   # A logical vector identifying which columns contain treatment data
   treatment_cols <- grepl(col_pattern, names(dataframe), ignore.case = TRUE)
 
   # All treatment columns are renamed "treatment", and then make_clean_names is used to ensure that
-  # if this produces duplicate column names that they are itterated with "_._" and then a counting
+  # if this produces duplicate column names that they are iterated with "_._" and then a counting
   # number.
   names(dataframe)[treatment_cols] <- "treatment"
   names(dataframe) <- janitor::make_clean_names(names(dataframe), unique_sep = "_._")

@@ -38,17 +38,30 @@ standardise_plot_number <- function(dataframe){
                                                  .data[["plot"]]))
         dataframe <- dplyr::select(dataframe, !.data[["sect"]])
     }
-    # determine by site if the plot number contains otc_treatment info. If the letters T or W
-    # are present then this indicates otc_treatment info.
-    dataframe <- dplyr::group_by(dataframe, site)
+
+    # determine if the plot number may contain otc_treatment info. i.e, if it contains non numeric data
+
     dataframe <- dplyr::mutate(
-        dataframe, .has_otc = sum(grepl("T|W", .data[["plot"]], ignore.case = TRUE)) > 0)
+        dataframe, .has_otc = grepl("[A-Z]",
+                                        .data[["plot"]], ignore.case = TRUE))
     dataframe <- dplyr::ungroup(dataframe)
 
     dataframe <- dplyr::mutate(
         dataframe,
-        # If the plot number contains otc information then it is extracted into the otc_treatment column
-        otc_treatment = ifelse(.has_otc == TRUE, gsub("\\d", "", .data[["plot"]]), .data[["otc_treatment"]]),
+        # If the plot number may contain otc information and no otc_information is otherwise provided,
+        # then it is extracted into the otc_treatment column. For beach_ridge, extract into snow_treatment
+        otc_treatment = ifelse(.has_otc == TRUE &
+                                   site != "Beach_Ridge" &
+                                   (is.na(otc_treatment) | otc_treatment == ""),
+                               gsub("\\d", "", .data[["plot"]]),
+                               .data[["otc_treatment"]]
+                               ),
+        snow_treatment = ifelse(.has_otc == TRUE &
+                                   site == "Beach_Ridge" &
+                                   (is.na(snow_treatment) | snow_treatment == ""),
+                               gsub("\\d", "", .data[["plot"]]),
+                               .data[["snow_treatment"]]
+        ),
         # Ensure that if CO2 information is stored within co2_plot column that it is moved to its own
         # column
         co2_plot = ifelse(grepl("co2", .data[["plot"]], ignore.case = TRUE), "Y", .data[["co2_plot"]]),
@@ -63,17 +76,21 @@ standardise_plot_number <- function(dataframe){
                           .data[["site"]], ignore.case = TRUE),
                       .data[["site"]]),
         # Ensure that any Cassiope or willow site labeled with "new" in the plot number is
-        # identified as an Annex site
-        site = ifelse(grepl("cass|will", .data[["site"]], ignore.case = TRUE)&
+        # identified as a cover plot
+        otc_treatment = ifelse(grepl("cass|will", .data[["site"]], ignore.case = TRUE)&
                           grepl("new", .data[["plot"]], ignore.case = TRUE),
-                      sub(".*(Cassiope|Willow).*", "Annex_\\1",
-                          .data[["site"]], ignore.case = TRUE),
-                      .data[["site"]]),
-        # Ensure letter in dome plots is right side of the plot number
+                      "cover",
+                      .data[["otc_treatment"]]),
+        # Ensure letter in dome plots is right side of the plot number and upper case with no spacer
         plot = ifelse(grepl("dome", .data[["site"]], ignore.case = TRUE)&
-                          grepl("[dg][0-9]+", .data[["plot"]], ignore.case = TRUE),
-                      gsub("([dg])([0-9]+)", "\\2\\1", .data[["plot"]], ignore.case = TRUE),
-                      .data[["plot"]]),
+                          grepl("^[dg].?[0-9]{1,2}$", .data[["plot"]], ignore.case = TRUE),
+                      toupper(sub("([dg]).?([0-9]+)", "\\2\\1", .data[["plot"]], ignore.case = TRUE)),
+                      ifelse(grepl("dome", .data[["site"]], ignore.case = TRUE)&
+                                 grepl("^[0-9]{1,2}.?[dg]$", .data[["plot"]], ignore.case = TRUE),
+                             toupper(sub("([0-9]{1,2}).?([dg])", "\\1\\2", .data[["plot"]], ignore.case = TRUE)),
+                             .data[["plot"]])),
+
+
         # Ensure that if snow treatment information was stored within the plot number that
         # this information is moved to the snow_treatment column
         snow_treatment = ifelse(grepl("A", .data[["plot"]], ignore.case = TRUE)&

@@ -80,7 +80,7 @@ standard_load_procedure <- function(file_path, sep, multi_header){
     if (length(dataframe) == 1){
         dataframe <- as.data.frame(dataframe)
     }
-    dataframe
+    dplyr::as_tibble(dataframe)
 }
 
 load <- function(skip, file_path, sep, skip_index){

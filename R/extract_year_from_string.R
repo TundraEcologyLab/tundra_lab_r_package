@@ -88,7 +88,7 @@ year_extractor <- function(string, date_format = "all", breaks = FALSE, unique =
         years <- lapply(string, year_extractor,
                         date_format = date_format,
                         breaks = breaks,
-                        unique -unique)
+                        unique = unique)
         years <- unlist(years)
     }
     if (unique){

@@ -138,6 +138,15 @@ solar_identifier <- function(dataframe, file_path, output_dir, W_or_KW = "KW", h
                 next}
         }
 
+        # Check that there is not multiple years of data while not passing through a winter. This is
+        # highly unlikely to have occurred and winter data is a very valuable identifier the absence
+        # of which makes the identification less robust
+        years <- unique(lubridate::year(dataframe_i$date))
+        if (length(years) > 1 & nrow(winter_months) == 0){
+            is_solar <- append(is_solar, FALSE)
+            next
+        }
+
    if (!hourly_data){
        solar_found <- daily_solar(dataframe_i, output_dir, file_path, i, winter_months, upper_limit)
        if (!solar_found){
@@ -166,8 +175,8 @@ daily_solar <- function(dataframe_i, output_dir, file_path, i, winter_months, up
         dplyr::filter(!(lubridate::month(date) %in% c(10, 11, 12, 1, 2, 3)))
     # If summer month period is too short to evaluate, and there is insufficient winter month data
     # to determine if data is solar take note of file and move on
-    if (length(summer_months[[i]]) < 30 &
-        length(winter_months[[i]]) < 30){
+    if (length(summer_months[[i]]) <= 30 &
+        length(winter_months[[i]]) <= 30){
 
         # The time periods entering and leaving winter are hard to diagnose and so are ignored
         # in the analysis. If more than 80% of the data pertains to these periods, write the
@@ -196,9 +205,31 @@ daily_solar <- function(dataframe_i, output_dir, file_path, i, winter_months, up
         non_zero_summer_data <- subset(summer_months, summer_above_zero)
         if (length(non_zero_summer_data[[1]]) > 30){
             summer_months <- non_zero_summer_data
+        } else {
+            return(FALSE)
         }
         # A check to further eliminate implausible data
         if (median(summer_months[[i]]) < upper_limit/10){
+            return(FALSE)
+        }
+        # Many repeats of the same value give a reasonable fit on a sinasoidal curve
+        # with amplitude 0. Summer solar data should not be made of many repeats of the
+        # same value, so return FALSE for any such data
+        # find the most repeated value
+        summer_mode <- Mode(summer_months[[i]])
+        # find the percentage representation of the most repeated value
+        mode_percent <- length(summer_months[[i]][summer_months[[i]] == summer_mode])/
+            length(summer_months[[i]])
+        if (mode_percent > 0.5){
+            return(FALSE)
+        }
+        # A linear increase through the first half of the summer, or decrease through
+        # the second half, will look sinasoidal. Categorical data like plant number can
+        # often have this appearance, and the true solar data will not as it possesses
+        # natural variation. Hence eliminate any data with near perfect linear fit to date.
+        model <- lm(summer_months[[i]] ~ summer_months$date)
+        r2 <- summary(model)$r.squared
+        if(is.na(r2) | (!is.na(r2) & r2 > 0.95)){
             return(FALSE)
         }
         # Apply a regression model against a sinusoidal model with period of one year

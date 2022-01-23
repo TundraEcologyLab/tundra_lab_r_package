@@ -29,5 +29,9 @@ Annex_Cassiope,
 Annex_BS_Willow,
 Annex_BS_Cassiope,
 Annex_Migration,
-Baker_Lake
+Baker_Lake,
+Fosheim,
+Claude/Tower,
+Princess.Marie.Bay,
+Sverdrup.Pass
 }

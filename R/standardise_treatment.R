@@ -27,15 +27,16 @@
 standardise_treatment <- function(dataframe){
     # Known treatment names for otc, cover, control, addition, and removal. If additional terms are
     # found they should be added to the appropriate list to ensure the function continues to work
-    # correctly. In each case, the name is standardised to the first entry in the vector.
+    # correctly. In each case, the name is standardised to the first entry in the vector. list is
+    # case insensitive.
     OTC <- c("OTC", "T", "W", "W(CO2)", "CO2_T", "OTC (CO2)")
-    cover <- c("cover", "Cover", "Cc")
+    cover <- c("cover", "Cc", "C cover", "C cov", "C-cov")
     control <- c("control", "Pheno", "C", "Cp", "CO2_C", "Control", "Control (CO2)", "Control(CO2)",
-                 "ctr", "CTR", "CTL", "ctl", "CON", "con")
+                 "ctr", "CTL", "ctl", "CON", "con", "C pheno")
     addition <- c("addition", "snow addition", "A", "Add")
     removal <- c("removal", "snow removal", "R", "Rem")
-    low <- c("low", "Low", "LOW")
-    high <- c("high", "High", "HIGH")
+    low <- c("low")
+    high <- c("high")
     water <- c("water", "Water", "WATER")
 
     # Each of the treatment vectors are combined in one list so they can be iterated through later
@@ -77,14 +78,19 @@ standardise_treatment <- function(dataframe){
         # For each treatment type in treatment list, find all examples of each treatment and ensure they
         # are all named as the first example in that treatment vector
         for (treat in treatment_list){
-            dataframe <- dplyr::mutate(dataframe, "{name}" := ifelse(.data[[name]] %in% treat,
+            dataframe <- dplyr::mutate(dataframe, "{name}" := ifelse(tolower(.data[[name]]) %in% tolower(treat),
                                                                      treat[1], .data[[name]]))
             # append standardised treatment name to standard_treats
             standard_treats <- append(standard_treats, treat[1])
         }
-        # remove all non-standard treatment names
-        dataframe <- dplyr::mutate(dataframe, "{name}" := ifelse(!.data[[name]] %in% standard_treats,
-                                                          NA, .data[[name]]))
+
+    }
+    # Ensure that any missing treatment columns are added, filled NA
+    needed_cols <- c("fert_treatment", "otc_treatment", "snow_treatment")
+    for (needed_col in needed_cols){
+        if (!needed_col %in% names(dataframe)){
+            dataframe <- dplyr::mutate(dataframe, "{needed_col}" := NA)
+        }
     }
     dataframe
 }

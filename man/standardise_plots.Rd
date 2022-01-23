@@ -12,15 +12,19 @@ standardise_plots(dataframe, output_dir, file_path)
 \item{output_dir}{The directory to which a warning file may be written if mixed treatment columns
 are encountered}
 
-\item{file_path}{The file_path that will be used to describe to origin of the data in a potential
+\item{file_path}{The file_path that will be used to describe the origin of the data in a potential
 warning file if mixed treatment columns are encountered}
 }
 \description{
 A function which accepts a dataframe and returns it with its plot descriptor data
-standardised. It combines the functions:
+standardised. Input dataframe should include a column named "site" detailing the site at Alex
+(eg Cassiope) and a column named "plot" containing the plot_number. If no "plot" column is
+present then the data is assumed to be site, rather than plot level, data and is labeled
+accordingly in the created plot_id as well as being given the plot number 0.
+Standardise_plots combines the functions:
 standardise_plot_col_names - to ensure all column names are consistent
 standardise_sites - To ensure that the site names are consistent
-standardise_plot_number - To ensure any additional data stored within the plot column is moved
+standardise_plot_number - To ensure any additional data stored within the plot column is moved to
 the appropriate column
 standardise_treatment - To ensure treatment names are consistent and treatment types (otc vs snow)
 are not mixed

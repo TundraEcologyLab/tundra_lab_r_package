@@ -17,22 +17,25 @@
 #' @param output_dir Directory to which a file of all conflicted data shall be written
 #' @export
 
-clean_data <- function(dataframe, upper_limit, lower_limit, name_pattern, output_dir){
+clean_data <- function(dataframe, upper_limit, lower_limit, name_pattern, output_dir, grouping = "date"){
   # Get names of all columns to clean
   names <- grep(name_pattern, names(dataframe), ignore.case = TRUE, value = TRUE)
   # create empty list for any conflicted data
   conflict_list <- list()
   # Arrange data in dataframe by ascending date
-  dataframe <- arrange(dataframe, date)
+  # ########dataframe <- arrange(dataframe, date)
   # For each column to be cleaned: convert all values outwith the given bounds, or that match
   # 6999 to NA. Calculate the standard deviation of the values that share a date in each column
   # to be cleaned. This will identify conflicted data.
+  for (group in grouping){
+    dataframe <- dplyr::group_by(dataframe, .data[[group]])
+  }
   for (name in names){
     dataframe <- dataframe %>%
       dplyr::mutate("{name}" := ifelse(.data[[name]] > upper_limit |
                                   .data[[name]] < lower_limit |
                                   grepl("6999", .data[[name]]), NA, .data[[name]])) %>%
-      dplyr::group_by(date) %>%
+      #dplyr::group_by(date) %>%
       dplyr::mutate("{name}_std" := sd(.data[[name]], na.rm = TRUE))
   }
   # Create a list of dataframes containing the data that didn't match for a given date,

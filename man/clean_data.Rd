@@ -4,7 +4,14 @@
 \alias{clean_data}
 \title{Remove Duplicate and Out-of-Bounds Data}
 \usage{
-clean_data(dataframe, upper_limit, lower_limit, name_pattern, output_dir)
+clean_data(
+  dataframe,
+  upper_limit,
+  lower_limit,
+  name_pattern,
+  output_dir,
+  grouping = "date"
+)
 }
 \arguments{
 \item{dataframe}{The dataframe containing the data to be cleaned}

@@ -2,9 +2,16 @@
 % Please edit documentation in R/load_file.R
 \name{load_file}
 \alias{load_file}
-\title{Load CSV or Tab deliminated files despite asymmetry}
+\title{Load CSV, Tab deliminated, or excel files despite asymmetry}
 \usage{
-load_file(file_path, sep = NULL, split_file = FALSE, multi_header = FALSE)
+load_file(
+  file_path,
+  sep = NULL,
+  split_file = FALSE,
+  multi_header = FALSE,
+  skip = NULL,
+  sheets = NULL
+)
 }
 \arguments{
 \item{file_path}{A path to the file which is to be loaded}
@@ -15,6 +22,15 @@ load_file(file_path, sep = NULL, split_file = FALSE, multi_header = FALSE)
 rows with the same number of columns}
 
 \item{multi_header}{Should multiple header lines be searched for within the file}
+
+\item{skip}{To be used for files where the header line can not be found automatically, most
+notably when the dataframe has 4 or less columns. skip is either set to the number of rows
+to skip to reach the column headers, or to "no header" if no header is present in the file.
+Setting the skip term will not work if split_file or multi_header are set to TRUE}
+
+\item{sheets}{Only relevant for excel files. Either a character vector of the name or names
+of the sheets to be loaded, or an integer vector of the index or indices of the sheets to
+be loaded}
 }
 \description{
 A function to load the data from the file identified in file_path. If no separator is provided
@@ -28,4 +44,9 @@ rows with the same number of columns
 If multi_header is TRUE, then the whole file is searched for possible header lines. If multiple
 headers are detected, the data between each header is loaded into separate dataframes and a list
 of these dataframes is returned
+If file is an excel file this is determined using readxl::excel_format and read using
+readxl::read_excel. If sheets == NULL then all sheets present will be loaded, else only the sheets
+identified in sheets. If only one sheet is loaded then a dataframe is returned, else a named
+list is returned containing all the sheets as separate dataframes. split_file may not be used when
+loading excel files.
 }

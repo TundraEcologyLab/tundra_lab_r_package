@@ -77,11 +77,11 @@ year_extractor <- function(string, date_format = "all", breaks = FALSE, unique =
     # Create an empty vector to contain all years found
     years <- NULL
 
-    # Perform searches. Search_given_format appends the years it finds to the years variable if
+    # Perform searches. grep_capture appends the years it finds to the years variable if
     # one is provided
     if (length(string) < 2){
 
-        years <- lapply(regex_list, search_given_format,
+        years <- lapply(regex_list, grep_capture,
                         string = string, target = years)
         years <- unlist(years)
     } else {
@@ -141,10 +141,10 @@ DOY_extractor <- function(string, three_digits = FALSE, breaks = FALSE, unique =
     # each string present
     if (length(string) < 2){
         # Perform search for 3 digit long days with appropriate regex
-        DOY <- search_given_format(regex_list[[1]], string)
+        DOY <- grep_capture(regex_list[[1]], string)
         # If search is not to be limited to 3 digit hits then complete search for lower digits
         if (!three_digits){
-            DOY <- search_given_format(regex_list[[2]], string, DOY)
+            DOY <- grep_capture(regex_list[[2]], string, DOY)
         }
     } else {
         # Call this function on all strings included in string
@@ -312,9 +312,9 @@ date_extractor <- function(string, date_format = "all", date_day_month = "date",
     # If multiple strings have been provided, run this function seperately on each, otherwise
     # perform search
     if (length(string) < 2){
-        # Perform searches. Search_given_format appends the components it finds to the
+        # Perform searches. grep_capture appends the components it finds to the
         # components variable if one is provided
-        component <- lapply(regex_list, search_given_format,
+        component <- lapply(regex_list, grep_capture,
                             string = string, target = component)
         component <- unlist(component)
     } else {
@@ -338,7 +338,19 @@ date_extractor <- function(string, date_format = "all", date_day_month = "date",
     }
     component
 }
-search_given_format <- function(regex, string, target = NULL){
+
+#' Extract from a regex capture statement
+#'
+#' A function which accepts a regex expression and a string to be searched. If the regex
+#' finds a hit within the string, and the regex contains brackets for capturing part of
+#' the hit then the captured text is returned. If there are multiple captured texts then
+#' they are returned individually in a character vector.
+#' @param regex A character string containing a regex expression with capture points
+#' @param string The character string which is to be searched
+#' @param target set to the default NULL. If grep_capture is to be vectorised across
+#' a list of strings then target can be used to pass the results from previous searches.
+#' The final result will then be an aggregate of all hits.
+grep_capture <- function(regex, string, target = NULL){
     if (length(string) == 0){return()}
     if (is.na(string)){return()}
     # Perform grep search for given regex. Result is a list of attributes

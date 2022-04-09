@@ -29,9 +29,9 @@ adjacent_extractor <- function(string, label, ignore.case = TRUE){
 
             # If adjacent cell contains a string extract everything in string
             if (grepl(paste0(label, '","'), string, ignore.case = ignore.case)){
-                hit <- sub(paste0(".*", label, '","([^"]*).*'), "\\1", string, ignore.case = ignore.case)
+                hit <- sub(paste0(".*", label, '"?,"([^"]*).*'), "\\1", string, ignore.case = ignore.case)
             } else { # If adjacent cell is not a string, extract whole cell
-                hit <- sub(paste0(".*", label, '",([^,]*).*'), "\\1", string, ignore.case = ignore.case)
+                hit <- sub(paste0(".*", label, '"?,([^,]*).*'), "\\1", string, ignore.case = ignore.case)
             }
             # If hit == string then no hit was extracted. Potentially the label was the final cell. Return NULL
             if (identical(string, hit)){

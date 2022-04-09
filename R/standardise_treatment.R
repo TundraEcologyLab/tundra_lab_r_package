@@ -30,7 +30,7 @@ standardise_treatment <- function(dataframe){
     # correctly. In each case, the name is standardised to the first entry in the vector. list is
     # case insensitive.
     OTC <- c("OTC", "T", "W", "W(CO2)", "CO2_T", "OTC (CO2)")
-    cover <- c("cover", "Cc", "C cover", "C cov", "C-cov")
+    cover <- c("cover", "Cc", "C cover", "C cov", "C-cov", " Cc")
     control <- c("control", "Pheno", "C", "Cp", "CO2_C", "Control", "Control (CO2)", "Control(CO2)",
                  "ctr", "CTL", "ctl", "CON", "con", "C pheno")
     addition <- c("addition", "snow addition", "A", "Add")

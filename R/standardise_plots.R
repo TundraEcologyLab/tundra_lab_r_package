@@ -46,6 +46,11 @@ standardise_plots <- function(dataframe, output_dir, file_path){
     # Ensure the data within the plot number is standardised, and moved to other columns as appropriate
     dataframe <- standardise_plot_number(dataframe)
 
+    # Repeat standardise_treatment to correct any treatments extracted from the plot number.
+    # Standardise_plot_number can not simply be run before standardise_treatment because
+    # standardise_treatment might extract plot information from treatment to plot for the BS sites
+    dataframe <- standardise_treatment(dataframe)
+
     # Load the plot_names dataframe
     plot_list <- plot_names
 

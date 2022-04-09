@@ -136,7 +136,7 @@ load <- function(skip, file_path, sep, skip_index, sheet = NULL){
                                     quote = "\"",
                                     comment.char = ""
 
-        ))
+        ), silent = TRUE)
 
         # If the found header does not cover all data read the csv file as if no header was found
         if (length(dataframe) == 0){

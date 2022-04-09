@@ -13,11 +13,28 @@
 
 file_type_identifier <- function(file_path){
     # Set spaces to a vector of integers counting the number of columns predicted
-    # per line if the separator is a space
-    spaces <- count.fields(file_path, quote = '""')
+    # per line if the separator is a space. Occasionally, when checking the wrong
+    # delimiter, the quoting becomes confused and the error "quoted string on line
+    # 1 terminated by EOF" is thrown by the count.fields function. The counting is
+    # performed within a try statement to avoid this problem.
+    spaces <- NA
+    try(spaces <- count.fields(file_path, quote = '""'), silent = TRUE)
     # Set commas to a vector of integers counting the number of columns predicted
     # per line if the separator is a comma
-    commas <- count.fields(file_path, sep = ",", quote = '""')
+    commas <- NA
+    try(commas <- count.fields(file_path, sep = ",", quote = '""'), silent = TRUE)
+
+    # Return an error if count.fields returns an error for both spaces and commas. If only
+    # one separator returns an error then return the other
+    if (is.na(spaces) & is.na(commas) & length(spaces) == 1 & length(commas) == 1){
+        stop("count.fields failed when applied to this file testing for both comma and tab
+             delimination. This is likely due to unusual use of quotes in the file. You can
+             try manually setting the sep variable.")
+    } else if (is.na(spaces) & length(spaces) == 1){
+        return(",")
+    } else if (is.na(commas) & length(commas) == 1){
+        return("")
+    }
 
     #remove NA values from both spaces and commas. NAs are generated if carriage returns
     # are encountered within a field

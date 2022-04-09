@@ -40,6 +40,7 @@ fill_parameter <- function(dataframe, extractor_function, output_dir, file_path,
                                             extractor_function,
                                             col_name,
                                             full_existing_check = full_existing_check,
+                                            breaks = breaks,
                                             ...)
     # Else, remove the erroneous column with name col_name
     if (!contains_parameter){

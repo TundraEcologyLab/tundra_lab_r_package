@@ -13,9 +13,9 @@ in tundra::plot_names}
 }
 \description{
 A function which accepts a dataframe with plot IDs and returns a dataframe with all
-treatment columns (OTC, snow and fert) completed based on the treatment information
-available for that plot in tundra::plot_names. If the plot ID can not be identified then
-the treatment info is unchanged. The input dataframe must be in the format produced by
-the standardise_plots function, in that it must have columns named "plot_id", "otc_treatment",
-"snow_treatment", and "fert_treatment".
+treatment columns (OTC, snow and fert), as well as the site and plot data completed based on
+the information available for that plot in tundra::plot_names. If the plot ID can not be
+identified then the treatment info is unchanged. The input dataframe must be in the format
+produced by the standardise_plots function, in that it must have columns named "plot_id",
+"otc_treatment", "snow_treatment", "fert_treatment", "site", and "plot".
 }

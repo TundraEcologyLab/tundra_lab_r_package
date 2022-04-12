@@ -350,6 +350,7 @@ date_extractor <- function(string, date_format = "all", date_day_month = "date",
 #' @param target set to the default NULL. If grep_capture is to be vectorised across
 #' a list of strings then target can be used to pass the results from previous searches.
 #' The final result will then be an aggregate of all hits.
+#' @export
 grep_capture <- function(regex, string, target = NULL){
     if (length(string) == 0){return()}
     if (is.na(string)){return()}

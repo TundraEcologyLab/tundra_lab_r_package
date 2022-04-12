@@ -4,12 +4,15 @@
 \alias{site_extractor}
 \title{extract site from string}
 \usage{
-site_extractor(string, unique = TRUE)
+site_extractor(string, unique = TRUE, as_null = TRUE)
 }
 \arguments{
 \item{string}{A character vector that is to be examined for sites}
 
 \item{unique}{Should result return all unique hits or a full list for counting occurrences}
+
+\item{as_null}{If TRUE then NULL is returned if there is no hits, which is good for counting.
+If False, then NA is returned if no hits, good for working with dataframes}
 }
 \description{
 A function which accepts a character vector and returns all unique instances within that string

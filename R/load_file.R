@@ -198,7 +198,7 @@ load <- function(skip, file_path, sep, skip_index, sheet = NULL){
                                         skip = skip,
                                         n_max = n_rows,
                                         .name_repair = "minimal"
-                                        )
+        )
     } else if (skip != "no header" & !is.null(sheet) & n_rows == -1){
         dataframe <- readxl::read_excel(path = file_path,
                                         sheet = sheet,
@@ -268,7 +268,7 @@ load_from_excel <- function(file_path, multi_header = FALSE, skip = NULL, sheets
         if (length(dataframe_top) == 0){
             sheets <- sheets[sheets != sheet]
             next
-            }
+        }
         # Find header line (or header lines if multi_header == TRUE) for the sheet, unless skip
         # has already been defined
         if (is.null(skip)){
@@ -300,9 +300,11 @@ load_from_excel <- function(file_path, multi_header = FALSE, skip = NULL, sheets
         all_dataframes <- append(all_dataframes, list(dataframe))
 
     }
-    # name the dataframes in all_dataframes with the sheet names
-    all_dataframes <- setNames(all_dataframes, sheets)
-
+    # name the dataframes in all_dataframes with the sheet names if there was more
+    # than one sheet
+    if (length(sheets) > 1){
+        all_dataframes <- setNames(all_dataframes, sheets)
+    }
 
     all_dataframes
 }

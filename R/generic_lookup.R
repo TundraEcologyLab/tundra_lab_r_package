@@ -15,7 +15,7 @@
 
 lookup <- function(key_col_name, key, lookup_table){
     # search the lookup table for the key
-    hit <- lookup_table %>% filter(.data[[key_col_name]] == key)
+    hit <- lookup_table %>% dplyr::filter(.data[[key_col_name]] == key)
     # Get list of column names in the lookup table minus the key_col. This will be used
     # to identify all the attributes that should be returned
     non_key_cols <- names(lookup_table)[names(lookup_table) != key_col_name]

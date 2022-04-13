@@ -30,6 +30,10 @@ treatments_from_plot_id <- function(dataframe){
                                                                                   nrow(.x))
     )
     })
+    # Somehow group_modify somehow converts columns to type factor. Convert them back to character
+    treatments <- treatments %>% dplyr::mutate(dplyr::across(dplyr::everything(), as.character)) %>%
+        dplyr::mutate(.row = as.numeric(.row))
+
     # Merge the dataframe with the treatments
     dataframe <- merge(dataframe, treatments)
 

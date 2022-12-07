@@ -1,6 +1,6 @@
 # tundra_lab_r_package
 
-It can be installed  by running the following code in R:\
+It can be installed  by running the following code in R:
 
 `install.packages("devtools")`\
 `library(devtools)`\
